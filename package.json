@@ -1,0 +1,31 @@
+{
+  "name": "smsAlerts",
+  "version": "1.0.0",
+  "description": "Send SMS Alerts",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hispindia/dhis2-sms-alerts.git"
+  },
+  "author": "harsh atal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hispindia/dhis2-sms-alerts/issues"
+  },
+  "homepage": "https://github.com/hispindia/dhis2-sms-alerts#readme",
+  "dependencies": {
+    "body-parser": "1.15.2",
+    "digest-auth-request": "^0.6.2",
+    "express": "4.14.0",
+    "moment": "2.13.0",
+    "q": "1.4.1",
+    "request": "2.72.0",
+    "request-digest": "^1.0.9",
+    "winston": "2.2.0",
+    "xml2json": "^0.11.0"
+  }
+}
