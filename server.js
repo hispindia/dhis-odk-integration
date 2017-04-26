@@ -2,6 +2,7 @@ var express = require('express');
 var http = require('http');
 var request = require('request');
 var _dhis2odk = require('./dhis2odk');
+var constant=require("./CONSTANTS");
 
 // Initialise
 var app = express();
@@ -50,18 +51,16 @@ global.__logger = new (winston.Logger)({
 });
 /**
  */
-var ajax = require("./ajax");
-var constant=require("./CONSTANTS");
 
 var dhis2odk = new _dhis2odk({
     odkhost : constant.ODKURL_HOST,
     odkpath : constant.ODKURL_PATH,
+    odkpathdata : constant.ODKURL_PATH_DATA,
     odkport : constant.ODKURL_PORT,
-    odkpath : constant.ODKURL_PATH,
     odkusername : constant.ODK_USERNAME,
     odkpassword : constant.ODK_PASSWORD
 });
-debugger
+
 dhis2odk.init();
 
 var server = app.listen(8000, function () {
