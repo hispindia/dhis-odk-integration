@@ -32,7 +32,7 @@ APIx.dhis2API = function(){
             url: baseURL + '/organisationUnits?level=1&fields=id,name'
         }, function(error,response){
             if (error){
-                console.log("root ou error");
+               // console.log("root ou error");
             }else{
                 ROOT_OU_UID = response.organisationUnits[0].id;
             }

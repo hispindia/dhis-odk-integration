@@ -3,6 +3,7 @@ var http = require('http');
 var request = require('request');
 var _dhis2odk = require('./dhis2odk');
 var constant=require("./CONSTANTS");
+var CronJob = require('cron').CronJob;
 
 // Initialise
 var app = express();
@@ -61,15 +62,24 @@ var dhis2odk = new _dhis2odk({
     odkpassword : constant.ODK_PASSWORD
 });
 
-dhis2odk.init();
 
 var server = app.listen(8000, function () {
 
     var host = server.address().address
     var port = server.address().port
 
-    __logger.info("Server listening at http://%s:%s", host, port)
+    __logger.info("Server listening at http://%s:%s", host, port);
 
+    var job = new CronJob({
+        cronTime: '00 59 23 * * *',
+        onTick: function() {
+            dhis2odk.init();
+        },
+        start: false,
+        runOnInit : true
+    });
+
+    job.start();
 
 })
 
