@@ -2,11 +2,12 @@
 module.exports = dhis2odk;
 
 var dhis2API = require("./dhis2API/dhis2API");
-var api = dhis2API();
+var api = new dhis2API();
 var ajax = require("./ajax");
 var constant=require("./CONSTANTS");
 var x2js = require('xml2json');
 var utility = require('./utility-functions');
+
 
 function dhis2odk(param){
 
@@ -69,7 +70,7 @@ function dhis2odk(param){
                 __logger.error(error);            
                 return;
             }
-            __logger.info("..Got InstanceIds");
+            __logger.debug("..Got InstanceIds");
             gotInstanceIds(body);
         });
     }
@@ -86,13 +87,14 @@ function dhis2odk(param){
 
         function fetchEntry(index,idList){
             if (index == idList.length){
+//            if (index == 2){
                 __logger.info("All Entries Fetched");
                 return
             }
 
             var id = idList[index];
 
-            __logger.info("Fetching Instance Data for ID="+id);            
+            __logger.info("Fetching Instance Data for ID=["+id+"]");            
             fetchODKInstance(id,gotInstance);
 
             function gotInstance(error,reponse,body){
@@ -100,13 +102,21 @@ function dhis2odk(param){
                     __logger.error(error);            
                     return;
                 }
-                __logger.info("..Got InstanceIds");
+                __logger.debug("..Got Instance Data");
                 
-                importODKInstanceToDHIS(JSON.parse(x2js.toJson(body)),callback);
+                importODKInstanceToDHIS(JSON.parse(x2js.toJson(body)),eventCreationCallback);
             }
             
-            function callback(error,response,body){
+            function eventCreationCallback(error,response,body){
+                if (error){
+                    __logger.error("POST Event By UID");
+                    fetchEntry(index+1,idList);
+                    return;
+                }
                 
+                var conflicts = api.getConflicts(response);
+                __logger.info("Event Creation resposne = " + body.message + " Conflicts="+conflicts);
+                fetchEntry(index+1,idList);
             }
         }
         
@@ -129,17 +139,23 @@ function dhis2odk(param){
         }
     }
 
-    function importODKInstanceToDHIS(odkFormData,callback){
+    function importODKInstanceToDHIS(odkFormData,eventCreationCallback){
 
+        var eventPreparationCount = 0;
         var data = odkFormData.submission.data.eDFSS_DataCollect;
         
         data = utility.flattenMap(data,"/");
         
-        var event = {dataValues:[]};
+        var event = {
+            programStage : constant.eventProgramStage,
+            program : constant.eventProgram,
+            dataValues:[],
+            status : "COMPLETED"
+        };
         for (var key in data){
             
             if (key == constant.ouODKKey){
-                event.orgUnit = data[key];
+                fetchOrgUnit(data[key],event);
                 continue;
             }
 
@@ -149,25 +165,98 @@ function dhis2odk(param){
             }
 
             if (key == constant.eventUIDKey){
-                event.uid = prepareUID(data[key]);
+                event.event = prepareUID(data[key]);
                 continue;
             }
             
             if (dataElementsCodeMap[constant.codePrefix+key]){
                 var deUID = dataElementsCodeMap[constant.codePrefix+key].id;
                 if (deUID){
+
+                    if (deUID == constant.deUIDCoordinate){
+                        var villageAndCoords = extractVillageAndCoordinates(data[key]);
+                        event.coordinate = villageAndCoords.coords;
+                        event.dataValues.push({
+                            dataElement: deUID,
+                            value:  villageAndCoords.village
+                        })
+                        continue;
+                    }
+                    
                     event.dataValues.push({
                         dataElement: deUID,
                         value:  data[key]
                     })
                 }
             } 
-        }       
+        }
         
-        function prepareUID(data){debugger
+        eventPreparationCallback();
 
-            var key = data.substring(data.length-11,data.length);
-            return key;
+        function extractVillageAndCoordinates(str){
+            
+            var result = {coords:{}};
+            var array = str.split("-");
+            
+            result.village = array[0] + "-" + array[1];
+            result.coords.latitude = array[2];
+            result.coords.longitude = array[3];
+
+            return result;
+        }
+
+        function fetchOrgUnit(code,event){
+            ajax.getReq(constant.DHIS_URL_BASE+"/api/organisationUnits?fields=id,name,code&filter=code:eq:"+code,constant.auth,callback);
+            function callback(error,response,body){
+                if (error){
+                    __logger.error("Fetch OrgUnitIDByCode ");
+                    eventPreparationCallback();
+                    
+                    return;
+                }
+                
+                event.orgUnit = JSON.parse(body).organisationUnits[0].id;
+                eventPreparationCallback();
+            }
+
+        }
+
+        function postEvent(event){
+
+            ajax.getReq(constant.DHIS_URL_BASE+"/api/events/"+event.event,constant.auth,getEvent)
+            
+            function getEvent(error,response,body){
+                if (error){
+                    __logger.error("Get Event By UID");
+                    eventCreationCallback(error,response,body);                        
+                    return;
+                }
+                body = JSON.parse(body);
+                if (body.status == "ERROR"){
+                    __logger.info("Event with UID ["+event.event+"] Does not Exist. Creating..")
+                    ajax.postReq(constant.DHIS_URL_BASE+"/api/events",event,constant.auth,callback);
+
+                    function callback(error,response,body){
+                        eventCreationCallback(error,response,body);                        
+                    }
+                }else{
+                    __logger.info("Event with UID ["+event.event+"] already exists.");
+                    body.message = "Event already exists"
+                    eventCreationCallback(error,response,body);                        
+                }
+            }         
+        }
+        function prepareUID(data){
+            var key = data.substring(data.length-10,data.length);
+            return "O"+key;
+        }
+        
+        function eventPreparationCallback(){
+            eventPreparationCount += 1;
+            
+            if (eventPreparationCount == 2){
+                postEvent(event);
+            }
         }
     }
 }

@@ -39,11 +39,11 @@ APIx.dhis2API = function(){
         });
 
         ajax.request( {
-                type: "GET",
-                async: true,
-                contentType: "application/json",
-                url: baseURL + 'schemas?fields=name,relativeApiEndpoint,apiEndpoint,properties[fieldName,required,simple,writable,propertyType,collection]'
-            }, populateSchemaMaps);
+            type: "GET",
+            async: true,
+            contentType: "application/json",
+            url: baseURL + 'schemas?fields=name,relativeApiEndpoint,apiEndpoint,properties[fieldName,required,simple,writable,propertyType,collection]'
+        }, populateSchemaMaps);
     }
 
     function populateSchemaMaps(error, response, body) {
@@ -75,13 +75,13 @@ APIx.dhis2API = function(){
     }
 
     this.save = function(domain,apiObject,_callback){
-            ajax.request({
-                type: "POST",
-                async: true,
-                contentType: "application/json",
-                data : JSON.stringify(apiObject),
-                url: "../../"+domain+"s"
-            },callback);
+        ajax.request({
+            type: "POST",
+            async: true,
+            contentType: "application/json",
+            data : JSON.stringify(apiObject),
+            url: "../../"+domain+"s"
+        },callback);
 
         function callback(error,response,body){
             _callback(error,response,body);
@@ -102,7 +102,7 @@ APIx.dhis2API = function(){
         }
 
         function callback(error,response,body){
-           _callback(error,response,body);
+            _callback(error,response,body);
         }
 
     }
@@ -153,7 +153,7 @@ APIx.dhis2API = function(){
                     }
                 }
 
-             args.then(null,filteredEvents);
+                args.then(null,filteredEvents);
             }
         }
     }
@@ -201,8 +201,26 @@ APIx.dhis2API = function(){
         }
     }
 
-     this.getConflicts = function(response){
+    this.getConflicts = function(response){
 
+
+        if (response.body){
+            var jsonRT = response.body.response;
+            if (jsonRT){
+                if (jsonRT.response){
+                if (jsonRT.response.conflicts){
+                    return jsonRT.response.conflicts;
+                }
+                if (jsonRT.response.importSummaries[0].conflicts){
+                    return jsonRT.response.importSummaries[0].conflicts;
+                }
+                if (jsonRT.response.importSummaries[0].status == "ERROR"){
+                    return ([{object:jsonRT.response.importSummaries[0].description,value:""}]);
+                }
+                }
+                
+            }
+        }
         if (response.responseText){
 
             if (!utility.isJson(response.responseText))
@@ -239,7 +257,7 @@ APIx.dhis2API = function(){
         return false;
     }
 
-     this.findReference = function(response){
+    this.findReference = function(response){
 
         if (response.response){
 
