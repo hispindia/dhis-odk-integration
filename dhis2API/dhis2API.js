@@ -106,12 +106,12 @@ APIx.dhis2API = function(){
         }
 
     }
-    this.getCustomObject = function(_retriever,...args){
+ /*   this.getCustomObject = function(_retriever,...args){
         if (this[_retriever]){
             this[_retriever](...args);
         }
     }
-
+*/
     this.CONSTANTS = CONSTANTS;
 
     this.getSchemaNameToObjectMap = function(){
