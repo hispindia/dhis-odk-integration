@@ -30,7 +30,49 @@ _.prepareUID = function(options,ids){
 
     return "CL"+uid.substr(0,9);
 }
+/*
+_.flattenMap = function(data,delimiter){
 
+    var flattenedData = {};
+    for (var key in data){
+        if (typeof data[key] == "object"){
+            for (var key2 in data[key]){
+                flattenedData[key+delimiter+key2] = data[key][key2]; 
+            }
+        }else{
+            flattenedData[key] = data[key]; 
+        }
+    }
+    return flattenedData;
+}
+*/
+_.flattenMap = function(data,delimiter){
+
+    var flattenedData = {};
+    for (var key in data){
+        var resultingKey = "";
+        inner(key,data[key],resultingKey,delimiter,flattenedData)
+    }
+
+    return flattenedData;
+
+    function inner(key,data,resultingKey,delimiter,flattenedData){
+        resultingKey += key;
+
+        if (typeof data == "object"){
+            var isEmpty = true;
+            for (var key in data){
+                isEmpty = false;
+                inner(key,data[key],resultingKey+delimiter,delimiter,flattenedData)
+            }
+            if (isEmpty){
+                //flattenedData[resultingKey] = undefined;
+            }
+        }else{
+            flattenedData[resultingKey] = data;
+        }
+    }
+}
 //http://stackoverflow.com/questions/9804777/how-to-test-if-a-string-is-json-or-not
 //http://stackoverflow.com/users/3119662/kubosho
 _.isJson = function(item) {

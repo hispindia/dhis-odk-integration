@@ -6,6 +6,7 @@ var api = dhis2API();
 var ajax = require("./ajax");
 var constant=require("./CONSTANTS");
 var x2js = require('xml2json');
+var utility = require('./utility-functions');
 
 function dhis2odk(param){
 
@@ -131,11 +132,42 @@ function dhis2odk(param){
     function importODKInstanceToDHIS(odkFormData,callback){
 
         var data = odkFormData.submission.data.eDFSS_DataCollect;
-
-        for (var key in data){
-            debugger
-        }
-        debugger
         
+        data = utility.flattenMap(data,"/");
+        
+        var event = {dataValues:[]};
+        for (var key in data){
+            
+            if (key == constant.ouODKKey){
+                event.orgUnit = data[key];
+                continue;
+            }
+
+            if (key == constant.eventDateKey){
+                event.eventDate = data[key];
+                continue;
+            }
+
+            if (key == constant.eventUIDKey){
+                event.uid = prepareUID(data[key]);
+                continue;
+            }
+            
+            if (dataElementsCodeMap[constant.codePrefix+key]){
+                var deUID = dataElementsCodeMap[constant.codePrefix+key].id;
+                if (deUID){
+                    event.dataValues.push({
+                        dataElement: deUID,
+                        value:  data[key]
+                    })
+                }
+            } 
+        }       
+        
+        function prepareUID(data){debugger
+
+            var key = data.substring(data.length-11,data.length);
+            return key;
+        }
     }
 }
