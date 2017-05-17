@@ -19,6 +19,21 @@ exports.postReq = function(url,data,auth,callback) {
     });
 }
 
+exports.putReq = function(url,data,auth,callback) {
+    request({
+        url: url,
+        method: "PUT",
+        json: true,   // <--Very important!!!
+        body: data,
+        headers: {
+            "Authorization": auth,
+            "Content-Type": "application/json",
+        }
+    }, function (error, response, body) {
+        callback(error,response,body);
+    });
+}
+
 exports.getReq = function(url,auth,callback) {
     
     request({

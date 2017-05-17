@@ -7,7 +7,7 @@ var ajax = require("./ajax");
 var constant=require("./CONSTANTS");
 var x2js = require('xml2json');
 var utility = require('./utility-functions');
-
+var alerts = require('./threshold-alerts');
 
 function dhis2odk(param){
 
@@ -31,7 +31,7 @@ function dhis2odk(param){
 
         fetchDEs();
         function fetchDEs(){
-            ajax.getReq(constant.DHIS_URL_BASE+"/api/dataElements?fields=id,name,code&filter=domainType:eq:TRACKER&skipPaging=true",constant.auth,gotDE);
+            ajax.getReq(constant.DHIS_URL_BASE+"/api/dataElements?fields=id,name,code&filter=domainType:eq:TRACKER&paging=false",constant.auth,gotDE);
 
             function gotDE(error,response,body){
                 
@@ -87,7 +87,7 @@ function dhis2odk(param){
 
         function fetchEntry(index,idList){
             if (index == idList.length){
-//            if (index == 2){
+            //if (index == 2){
                 __logger.info("All Entries Fetched");
                 return
             }
@@ -109,13 +109,13 @@ function dhis2odk(param){
             
             function eventCreationCallback(error,response,body){
                 if (error){
-                    __logger.error("POST Event By UID");
+                    __logger.error("POST/PUT Event By UID");
                     fetchEntry(index+1,idList);
                     return;
                 }
                 
                 var conflicts = api.getConflicts(response);
-                __logger.info("Event Creation resposne = " + body.message + " Conflicts="+conflicts);
+                __logger.info("Event Creation/Updation resposne = " + body.message + " Conflicts="+conflicts);
                 fetchEntry(index+1,idList);
             }
         }
@@ -135,7 +135,7 @@ function dhis2odk(param){
             }, function (error, response, body) {
                 
                 callback(error,response,body)
-            });   
+            });  
         }
     }
 
@@ -210,24 +210,71 @@ function dhis2odk(param){
             function callback(error,response,body){
                 if (error){
                     __logger.error("Fetch OrgUnitIDByCode ");
-                    eventPreparationCallback();
-                    
+                    eventPreparationCallback();                    
                     return;
                 }
                 
                 event.orgUnit = JSON.parse(body).organisationUnits[0].id;
                 eventPreparationCallback();
             }
+        }
+        
+        function trackerImport(){
+            
+            
+            teiUID = "T"+event.event.substring(1,event.event.length);
+            enrollmentUID = "E"+event.event.substring(1,event.event.length);
+
+            ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances/"+teiUID,constant.auth,function(error,response,body){
+                 if (error){
+                    __logger.error("Get TEI By UID");                    
+                    return;
+                }
+
+              
+                var tei = {
+                    "trackedEntityInstance": teiUID,
+                    "trackedEntity" : constant.trackedEntity,
+                    "orgUnit": event.orgUnit,
+                     "attributes": [ {
+                         "attribute": constant.teiUID_TEA,
+                         "value": teiUID
+                     } ],
+                    "enrollments": [ {
+                        "enrollment" : enrollmentUID,
+                        "orgUnit": event.orgUnit,
+                        "program": constant.eventProgram,
+                        "enrollmentDate": event.eventDate,
+                        "incidentDate": event.eventDate
+                    } ]
+                }
+
+                
+                ajax.postReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances",tei,constant.auth,teiSave);
+            
+                function teiSave(error,response,body){
+                    if (error){
+                           __logger.error("Save TEI");                    
+                           return;
+                       }
+                    
+                    event.trackedEntityInstance = teiUID;
+                    event.enrollment = enrollmentUID;
+
+                    postEvent(event)
+                    
+                }
+            })
 
         }
 
         function postEvent(event){
-
+            
             ajax.getReq(constant.DHIS_URL_BASE+"/api/events/"+event.event,constant.auth,getEvent)
             
             function getEvent(error,response,body){
                 if (error){
-                    __logger.error("Get Event By UID");
+                    __logger.error("Get Event By UID");                    
                     eventCreationCallback(error,response,body);                        
                     return;
                 }
@@ -241,11 +288,16 @@ function dhis2odk(param){
                     }
                 }else{
                     __logger.info("Event with UID ["+event.event+"] already exists.");
-                    body.message = "Event already exists"
+                    body.message = "Event already exists";
+                    
+                    //ajax.putReq(constant.DHIS_URL_BASE+"/api/events/"+event.event,event,constant.auth,eventCreationCallback)
+                    alerts.checkForHotspot(event.event);
                     eventCreationCallback(error,response,body);                        
                 }
             }         
         }
+
+      
         function prepareUID(data){
             var key = data.substring(data.length-10,data.length);
             return "O"+key;
@@ -255,7 +307,7 @@ function dhis2odk(param){
             eventPreparationCount += 1;
             
             if (eventPreparationCount == 2){
-                postEvent(event);
+                trackerImport();
             }
         }
     }

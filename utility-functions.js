@@ -31,20 +31,20 @@ _.prepareUID = function(options,ids){
     return "CL"+uid.substr(0,9);
 }
 /*
-_.flattenMap = function(data,delimiter){
+  _.flattenMap = function(data,delimiter){
 
-    var flattenedData = {};
-    for (var key in data){
-        if (typeof data[key] == "object"){
-            for (var key2 in data[key]){
-                flattenedData[key+delimiter+key2] = data[key][key2]; 
-            }
-        }else{
-            flattenedData[key] = data[key]; 
-        }
-    }
-    return flattenedData;
-}
+  var flattenedData = {};
+  for (var key in data){
+  if (typeof data[key] == "object"){
+  for (var key2 in data[key]){
+  flattenedData[key+delimiter+key2] = data[key][key2]; 
+  }
+  }else{
+  flattenedData[key] = data[key]; 
+  }
+  }
+  return flattenedData;
+  }
 */
 _.flattenMap = function(data,delimiter){
 
@@ -108,5 +108,15 @@ _.unshadowStringify = function(str){
     str = str.replace(/>/g,'}');
 
     return JSON.parse(str);
+}
+
+_.findValueAgainstId = function (data,idKey,id,valKey){
+
+    for (var i=0;i<data.length;i++){
+        if (data[i][idKey]==id){
+            return data[i][valKey]
+        }
+    }
+    return null;
 }
 module.exports = _;
