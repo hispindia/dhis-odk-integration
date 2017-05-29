@@ -73,6 +73,15 @@ _.flattenMap = function(data,delimiter){
         }
     }
 }
+_.getMapLength = function(map){
+    var index =0;
+    for (var key in map){
+        index = index+1;
+    }
+    
+    return index;
+}
+
 //http://stackoverflow.com/questions/9804777/how-to-test-if-a-string-is-json-or-not
 //http://stackoverflow.com/users/3119662/kubosho
 _.isJson = function(item) {
