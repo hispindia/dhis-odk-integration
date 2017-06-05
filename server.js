@@ -4,6 +4,7 @@ var request = require('request');
 var _dhis2odk = require('./dhis2odk');
 var constant=require("./CONSTANTS");
 var CronJob = require('cron').CronJob;
+var alerts = require('./threshold-alerts');
 
 // Initialise
 var app = express();
@@ -139,6 +140,28 @@ var dhis2odk_ipd_aggregate = new _dhis2odk({
 
 });
 
+
+
+var dhis2odk_test = new _dhis2odk({
+    odkhost : constant.ODKURL_HOST,
+    odkpath : constant.ODK2DHIS["Test"].ODK_URL_PATH,
+    odkpathdata : constant.ODK2DHIS["Test"].ODK_URL_PATH_DATA,
+    odkport : constant.ODKURL_PORT,
+    odkusername : constant.ODK_USERNAME,
+    odkpassword : constant.ODK_PASSWORD,
+    odkformid : constant.ODK2DHIS["Test"].ODK_formId,
+    odkquestionprefixid : constant.ODK2DHIS["Test"].ODK_questionPrefixId,
+    odkquestionvillage : constant.ODK2DHIS["Test"].ODK_QUESTION_VILLAGE,
+    odkeventDateKey : constant.ODK2DHIS["Test"].ODK_eventDateKey,
+    odkeventUIDKey : constant.ODK2DHIS["Test"].ODK_eventUIDKey,
+
+    dhis_trackedEntity : constant.ODK2DHIS["Test"].DHIS_TE,
+    dhis_program : constant.ODK2DHIS["Test"].DHIS_PROGRAM,
+    dhis_programStage : constant.ODK2DHIS["Test"].DHIS_PROGRAMSTAGE,
+    dhis_categoryCombo : constant.ODK2DHIS["Test"].DHIS_CC,
+
+});
+
 var server = app.listen(8000, function () {
     var host = server.address().address
     var port = server.address().port
@@ -149,7 +172,8 @@ var server = app.listen(8000, function () {
         cronTime: '00 59 23 * * *',
         onTick: function() {
             
-            dhis2odk_ipd.init();
+            dhis2odk_test.init();
+            //alerts.init();
         },
         start: false,
         runOnInit : true

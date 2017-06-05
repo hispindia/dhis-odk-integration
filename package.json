@@ -20,6 +20,7 @@
   "dependencies": {
     "body-parser": "1.15.2",
     "cron": "^1.2.1",
+    "deepmerge": "^1.3.2",
     "digest-auth-request": "^0.6.2",
     "express": "4.14.0",
     "jquery": "^3.2.1",
