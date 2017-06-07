@@ -46,7 +46,7 @@ _.prepareUID = function(options,ids){
   return flattenedData;
   }
 */
-_.flattenMap = function(data,delimiter){
+_.flattenMap = function(data,delimiter,includeUndefined){
 
     var flattenedData = {};
     for (var key in data){
@@ -65,8 +65,8 @@ _.flattenMap = function(data,delimiter){
                 isEmpty = false;
                 inner(key,data[key],resultingKey+delimiter,delimiter,flattenedData)
             }
-            if (isEmpty){
-                //flattenedData[resultingKey] = undefined;
+            if (isEmpty && includeUndefined){                
+                flattenedData[resultingKey] = undefined;                
             }
         }else{
             flattenedData[resultingKey] = data;

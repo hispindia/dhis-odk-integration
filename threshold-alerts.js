@@ -7,7 +7,7 @@ var merge = require('deepmerge');
 
 function thresholdAlerts(){
     
-    ajax.getReq(constant.DHIS_URL_BASE+"/api/dataElementGroups?fields=id,name,dataElements[id,name]",constant.auth,getDES);
+  //  ajax.getReq(constant.DHIS_URL_BASE+"/api/dataElementGroups?fields=id,name,dataElements[id,name]",constant.auth,getDES);
     var labDES;
     
     function getDES(error,response,body){

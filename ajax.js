@@ -91,3 +91,25 @@ exports.sendSMS = function(msg,phone){
     }
 
 }
+
+
+exports.odkRequest = function(path,callback){
+
+    var constant = require("./CONSTANTS");
+
+  var digestRequest = require('request-digest')(constant.ODK_USERNAME, constant.ODK_PASSWORD);
+        digestRequest.request({
+            host: constant.ODKURL_HOST,
+            path: path,
+            port: constant.ODKURL_PORT,
+            method: 'GET',
+            headers: {
+                'Custom-Header': 'OneValue',
+                'Other-Custom-Header': 'OtherValue'
+            }
+        }, function (error, response, body) {
+            callback(error, response, body)
+        });
+
+
+}

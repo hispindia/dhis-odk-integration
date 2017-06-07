@@ -28,6 +28,7 @@
     "q": "1.4.1",
     "request": "2.72.0",
     "request-digest": "^1.0.9",
+    "underscore": "^1.8.3",
     "winston": "2.2.0",
     "xml2json": "^0.11.0"
   }

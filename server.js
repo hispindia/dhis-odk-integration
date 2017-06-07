@@ -54,113 +54,8 @@ global.__logger = new (winston.Logger)({
 /**
  */
 
-var dhis2odk_ipd = new _dhis2odk({
-    odkhost : constant.ODKURL_HOST,
-    odkpath : constant.ODK2DHIS["eDFSS_IPD_V3"].ODK_URL_PATH,
-    odkpathdata : constant.ODK2DHIS["eDFSS_IPD_V3"].ODK_URL_PATH_DATA,
-    odkport : constant.ODKURL_PORT,
-    odkusername : constant.ODK_USERNAME,
-    odkpassword : constant.ODK_PASSWORD,
-    odkformid : constant.ODK2DHIS["eDFSS_IPD_V3"].ODK_formId,
-    odkquestionprefixid : constant.ODK2DHIS["eDFSS_IPD_V3"].ODK_questionPrefixId,
-    odkquestionvillage : constant.ODK2DHIS["eDFSS_IPD_V3"].ODK_QUESTION_VILLAGE,
-    odkeventDateKey : constant.ODK2DHIS["eDFSS_IPD_V3"].ODK_eventDateKey,
-    odkeventUIDKey : constant.ODK2DHIS["eDFSS_IPD_V3"].ODK_eventUIDKey,
-
-    dhis_trackedEntity : constant.ODK2DHIS["eDFSS_IPD_V3"].DHIS_TE,
-    dhis_program : constant.ODK2DHIS["eDFSS_IPD_V3"].DHIS_PROGRAM,
-    dhis_programStage : constant.ODK2DHIS["eDFSS_IPD_V3"].DHIS_PROGRAMSTAGE,
-    dhis_categoryCombo : constant.ODK2DHIS["eDFSS_IPD_V3"].DHIS_CC,
-
-});
 
 
-var dhis2odk_opd = new _dhis2odk({
-    odkhost : constant.ODKURL_HOST,
-    odkpath : constant.ODK2DHIS["eDFSS_OPD_V3"].ODK_URL_PATH,
-    odkpathdata : constant.ODK2DHIS["eDFSS_OPD_V3"].ODK_URL_PATH_DATA,
-    odkport : constant.ODKURL_PORT,
-    odkusername : constant.ODK_USERNAME,
-    odkpassword : constant.ODK_PASSWORD,
-    odkformid : constant.ODK2DHIS["eDFSS_OPD_V3"].ODK_formId,
-    odkquestionprefixid : constant.ODK2DHIS["eDFSS_OPD_V3"].ODK_questionPrefixId,
-    odkquestionvillage : constant.ODK2DHIS["eDFSS_OPD_V3"].ODK_QUESTION_VILLAGE,
-    odkeventDateKey : constant.ODK2DHIS["eDFSS_OPD_V3"].ODK_eventDateKey,
-    odkeventUIDKey : constant.ODK2DHIS["eDFSS_OPD_V3"].ODK_eventUIDKey,
-
-    dhis_trackedEntity : constant.ODK2DHIS["eDFSS_OPD_V3"].DHIS_TE,
-    dhis_program : constant.ODK2DHIS["eDFSS_OPD_V3"].DHIS_PROGRAM,
-    dhis_programStage : constant.ODK2DHIS["eDFSS_OPD_V3"].DHIS_PROGRAMSTAGE,
-    dhis_categoryCombo : constant.ODK2DHIS["eDFSS_OPD_V3"].DHIS_CC,
-
-});
-
-
-
-
-var dhis2odk_lab = new _dhis2odk({
-    odkhost : constant.ODKURL_HOST,
-    odkpath : constant.ODK2DHIS["DPHL_Lab_V1"].ODK_URL_PATH,
-    odkpathdata : constant.ODK2DHIS["DPHL_Lab_V1"].ODK_URL_PATH_DATA,
-    odkport : constant.ODKURL_PORT,
-    odkusername : constant.ODK_USERNAME,
-    odkpassword : constant.ODK_PASSWORD,
-    odkformid : constant.ODK2DHIS["DPHL_Lab_V1"].ODK_formId,
-    odkquestionprefixid : constant.ODK2DHIS["DPHL_Lab_V1"].ODK_questionPrefixId,
-    odkquestionvillage : constant.ODK2DHIS["DPHL_Lab_V1"].ODK_QUESTION_VILLAGE,
-    odkeventDateKey : constant.ODK2DHIS["DPHL_Lab_V1"].ODK_eventDateKey,
-    odkeventUIDKey : constant.ODK2DHIS["DPHL_Lab_V1"].ODK_eventUIDKey,
-
-    dhis_trackedEntity : constant.ODK2DHIS["DPHL_Lab_V1"].DHIS_TE,
-    dhis_program : constant.ODK2DHIS["DPHL_Lab_V1"].DHIS_PROGRAM,
-    dhis_programStage : constant.ODK2DHIS["DPHL_Lab_V1"].DHIS_PROGRAMSTAGE,
-    dhis_categoryCombo : constant.ODK2DHIS["DPHL_Lab_V1"].DHIS_CC,
-
-});
-
-
-
-var dhis2odk_ipd_aggregate = new _dhis2odk({
-    odkhost : constant.ODKURL_HOST,
-    odkpath : constant.ODK2DHIS["IPD_Aggregate_V1"].ODK_URL_PATH,
-    odkpathdata : constant.ODK2DHIS["IPD_Aggregate_V1"].ODK_URL_PATH_DATA,
-    odkport : constant.ODKURL_PORT,
-    odkusername : constant.ODK_USERNAME,
-    odkpassword : constant.ODK_PASSWORD,
-    odkformid : constant.ODK2DHIS["IPD_Aggregate_V1"].ODK_formId,
-    odkquestionprefixid : constant.ODK2DHIS["IPD_Aggregate_V1"].ODK_questionPrefixId,
-    odkquestionvillage : constant.ODK2DHIS["IPD_Aggregate_V1"].ODK_QUESTION_VILLAGE,
-    odkeventDateKey : constant.ODK2DHIS["IPD_Aggregate_V1"].ODK_eventDateKey,
-    odkeventUIDKey : constant.ODK2DHIS["IPD_Aggregate_V1"].ODK_eventUIDKey,
-
-    dhis_trackedEntity : constant.ODK2DHIS["IPD_Aggregate_V1"].DHIS_TE,
-    dhis_program : constant.ODK2DHIS["IPD_Aggregate_V1"].DHIS_PROGRAM,
-    dhis_programStage : constant.ODK2DHIS["IPD_Aggregate_V1"].DHIS_PROGRAMSTAGE,
-    dhis_categoryCombo : constant.ODK2DHIS["IPD_Aggregate_V1"].DHIS_CC,
-
-});
-
-
-
-var dhis2odk_test = new _dhis2odk({
-    odkhost : constant.ODKURL_HOST,
-    odkpath : constant.ODK2DHIS["Test"].ODK_URL_PATH,
-    odkpathdata : constant.ODK2DHIS["Test"].ODK_URL_PATH_DATA,
-    odkport : constant.ODKURL_PORT,
-    odkusername : constant.ODK_USERNAME,
-    odkpassword : constant.ODK_PASSWORD,
-    odkformid : constant.ODK2DHIS["Test"].ODK_formId,
-    odkquestionprefixid : constant.ODK2DHIS["Test"].ODK_questionPrefixId,
-    odkquestionvillage : constant.ODK2DHIS["Test"].ODK_QUESTION_VILLAGE,
-    odkeventDateKey : constant.ODK2DHIS["Test"].ODK_eventDateKey,
-    odkeventUIDKey : constant.ODK2DHIS["Test"].ODK_eventUIDKey,
-
-    dhis_trackedEntity : constant.ODK2DHIS["Test"].DHIS_TE,
-    dhis_program : constant.ODK2DHIS["Test"].DHIS_PROGRAM,
-    dhis_programStage : constant.ODK2DHIS["Test"].DHIS_PROGRAMSTAGE,
-    dhis_categoryCombo : constant.ODK2DHIS["Test"].DHIS_CC,
-
-});
 
 var server = app.listen(8000, function () {
     var host = server.address().address
@@ -172,7 +67,7 @@ var server = app.listen(8000, function () {
         cronTime: '00 59 23 * * *',
         onTick: function() {
             
-            dhis2odk_test.init();
+            new _dhis2odk().init();
             //alerts.init();
         },
         start: false,
