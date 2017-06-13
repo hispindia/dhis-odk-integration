@@ -25,6 +25,7 @@
     "express": "4.14.0",
     "jquery": "^3.2.1",
     "moment": "^2.13.0",
+    "moment-range": "^3.0.3",
     "q": "1.4.1",
     "request": "2.72.0",
     "request-digest": "^1.0.9",

@@ -4,7 +4,9 @@ var request = require('request');
 var _dhis2odk = require('./dhis2odk');
 var constant=require("./CONSTANTS");
 var CronJob = require('cron').CronJob;
-var alerts = require('./threshold-alerts');
+var thresholdAlerts = require('./threshold-alerts1');
+var clusterHistoric = require('./clusterHistoric');
+var moment = require("moment");
 
 // Initialise
 var app = express();
@@ -67,8 +69,12 @@ var server = app.listen(8000, function () {
         cronTime: '00 59 23 * * *',
         onTick: function() {
             
-            new _dhis2odk().init();
-            //alerts.init();
+            //new _dhis2odk().init();
+            var startDate = moment("12-31-2016", "MM-DD-YYYY");;
+            //  startDate = startDate.setDate(startDate.getDate() - 50);            
+            var endDate = moment();
+            
+            new clusterHistoric(startDate,endDate);
         },
         start: false,
         runOnInit : true

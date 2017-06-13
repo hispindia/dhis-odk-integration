@@ -14,7 +14,7 @@ function createEvent(data,dataElementsCodeMap,formId,callback){
         
     if (constant.ODK2DHIS[formId]){
         if (constant.ODK2DHIS[formId]["ODK_OrgUnitQuestion"]){
-            ODK_OrgUnitQuestion = constant.ODK2DHIS[formId]["ODK_OrgUnitQuestion"].ODK_OrgUnitQuestion;
+            ODK_OrgUnitQuestion = constant.ODK2DHIS[formId]["ODK_OrgUnitQuestion"];
         }
     }
 
@@ -42,13 +42,13 @@ function createEvent(data,dataElementsCodeMap,formId,callback){
 
     for (var key in data){
         
-
         if (key == ODK_OrgUnitQuestion){
             var orgUnitQuestion = data[key];
             __logger.debug("Got OU  ODK Question " + orgUnitQuestion);
 
             event.orgUnit = orgUnitQuestion.split("-")[0];
             event.coordinate = extractCoordinates(orgUnitQuestion);
+            
           //  __logger.debug(" OU  coordinates =" + event.coordinate);
             
         }
@@ -106,8 +106,8 @@ function createEvent(data,dataElementsCodeMap,formId,callback){
                 __logger.info("Event with UID ["+event.event+"] already exists.");
                 body.message = "Event already exists";
                 
-               // ajax.putReq(constant.DHIS_URL_BASE+"/api/events/"+event.event,event,constant.auth,eventCreationCallback)
-                eventCreationCallback(null,response,{message : "Ignoring update case"});                        
+                ajax.putReq(constant.DHIS_URL_BASE+"/api/events/"+event.event,event,constant.auth,eventCreationCallback)
+               // eventCreationCallback(null,response,{message : "Ignoring update case"});                        
            
             }
         }         

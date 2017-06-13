@@ -128,4 +128,26 @@ _.findValueAgainstId = function (data,idKey,id,valKey){
     }
     return null;
 }
+
+
+_.checkListForValue = function (data,idKey,id,valKey,values){
+    for (var i=0;i<data.length;i++){
+        if (data[i][idKey]==id){
+            for (var key in values){
+                if (data[i][valKey] == values[key]){
+                    return true
+                }
+            }
+        }
+    }
+    return false;
+}
+
+_.reduce = function(list,id,seperator){
+    var accumlator = "";
+    for (var key in list){
+        accumlator = accumlator + list[key][id] + seperator;
+    }
+    return accumlator;
+}
 module.exports = _;
