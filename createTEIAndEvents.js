@@ -11,7 +11,7 @@ var format = "YYYY-MM-DD";
 
 var clusterID;
 function getClusterID(callback){
-    ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances?ouMode=DESCENDANTS&ou="+constant.DHIS_ROOT_OU_UID,constant.auth,function(error,reponse,body){
+ /*   ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances?ouMode=DESCENDANTS&ou="+constant.DHIS_ROOT_OU_UID,constant.auth,function(error,reponse,body){
         if (error){
             __logger.error("Get Cluster ID");
         }
@@ -21,19 +21,21 @@ function getClusterID(callback){
      
         callback()
     })
+*/
 
+callback()
 }
 
 function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,callback){
     getClusterID(function(){
-
+        
         
         var startDate = new Date(cluster_tei.enrollments[0].enrollmentDate);
     //    startDate.setDate(startDate.getDate() - 7);            
         var endDate = new Date(cluster_tei.enrollments[0].enrollmentDate);
 
 
-      
+        clusterID = moment(startDate).format(format);
         cluster_tei.attributes.push({
             "attribute": constant.CLUSTER_TEA_CLUSTER_TYPE,
             "value": clusterType
@@ -69,7 +71,7 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
             if (teis.trackedEntityInstances.length == 0){
                 cluster_tei.attributes.push({
                     "attribute": constant.CLUSTER_TEA_CLUSTERID,
-                    "value": "CLUSTER_"+(clusterID + 1)
+                    "value": "CLUSTER_"+(clusterID)
                 })
                 makeNewTEI();
             }else{
@@ -84,7 +86,7 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
                     if (error){
                         __logger.error("Update Cluster")
                     }
-                   
+                    
                     __logger.info("Updated Cluster with UID -"+body.response.reference)
                     callback();
                     

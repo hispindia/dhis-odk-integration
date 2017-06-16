@@ -120,7 +120,7 @@ function thresholdAlerts(param){
                     "value": "true"
                 })             
             }
-            if (lab_cases){debugger
+            if (lab_cases){
                            clusterFound = true;
                            total_cases.push(lab_cases);
                            cluster_tei.attributes.push({
@@ -249,9 +249,9 @@ function thresholdAlerts(param){
         
         for (var i=0;i<events.length;i++){
             for (var key in labDES){
-                var value = utility.findValueAgainstId(events[i].dataValues,"dataElement",key,"value");
+                var value = utility.findValueAgainstId(events[i].dataValues,"dataElement",labDES[key].id,"value");
                 if (value && value.indexOf("Positive")!=-1){
-                    found_events.push(event[i].event)                    
+                    found_events.push(events[i].event)                    
                 }                    
             }                
         }
