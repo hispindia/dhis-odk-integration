@@ -10,7 +10,7 @@ function* dateMaker(startDate,endDate){
  
     const range = moment.range(startDate,endDate);
   
-    for (let day of range.by('days')) {
+    for (var day of range.by('days')) {
         yield day.format('YYYY-MM-DD');
     }
 }

@@ -18,16 +18,16 @@ function dhis2odk(param){
     var _index = -1;
     var _formList;
 
-    this.init = function(){
+    this.init = function(mainCallback){
         fetchDHISMetadata(callback);
         
         function callback(){
-            fetchODKForms();
+            fetchODKForms(mainCallback);
         
         }      
     }
 
-    function fetchODKForms(){
+    function fetchODKForms(mainCallback){
         
         __logger.info("Fetching Forms..");
         
@@ -45,13 +45,17 @@ function dhis2odk(param){
             _formList = underscore.map(forms,function(form){
                 return form.url.split("=")[1];
             })
-            odkRotor();       
+            odkRotor(mainCallback);       
         };        
     }
 
-    function odkRotor(){
+    function odkRotor(mainCallback){
         _index = _index+1;
-        if (_index == _formList.length){return}
+        if (_index == _formList.length){
+            __logger.info("Finished importing all forms")
+            mainCallback();
+            return
+        }
 
         fetchQuestionDetails(_formList[_index])
         

@@ -69,12 +69,14 @@ var server = app.listen(8000, function () {
         cronTime: '00 59 23 * * *',
         onTick: function() {
             
-            //new _dhis2odk().init();
-            var startDate = moment("12-31-2016", "MM-DD-YYYY");;
-            //  startDate = startDate.setDate(startDate.getDate() - 50);            
-            var endDate = moment();
+            new _dhis2odk().init(function(){
+                var startDate = moment("12-31-2016", "MM-DD-YYYY");;
+                //  startDate = startDate.setDate(startDate.getDate() - 50);            
+                var endDate = moment();
+                
+                new clusterHistoric(startDate,endDate);
+            });
             
-            new clusterHistoric(startDate,endDate);
         },
         start: false,
         runOnInit : true
