@@ -23,6 +23,7 @@ ajax.getReq(constant.DHIS_URL_BASE+"/api/dataElementGroups?fields=id,name,dataEl
 function getDES(error,response,body){
     if (error){
         __logger.error("dataelementgroups fetch")
+        
     }
     
     var degroup = JSON.parse(body);
@@ -54,8 +55,8 @@ function thresholdAlerts(param){
             }
 
             var allCases = JSON.parse(body).events;
-            var fixedAlgoCases = filterEventsByDataValue(allCases,"dataElement",constant.DHIS_DE_ODK_FORMID,"value",["DPHL_Lab_V1","eDFSS_IPD_V3","eDFSS_OPD_V3"])
-            var ouWiseCasesMap = utility.prepareMapGroupedById(allCases,"orgUnit");
+            var fixedAlgoCases = filterEventsByDataValue(allCases,"dataElement",constant.DHIS_DE_ODK_FORMID,"value",["DPHL_Lab_V1","eDFSS_IPD_V3"])
+            var ouWiseCasesMap = utility.prepareMapGroupedById(fixedAlgoCases,"orgUnit");
             findClusters(ouWiseCasesMap,moment(startDate).format(format),callback);
             
             

@@ -106,8 +106,8 @@ function createEvent(data,dataElementsCodeMap,formId,callback){
                 __logger.info("Event with UID ["+event.event+"] already exists.");
                 body.message = "Event already exists";
                 
-                ajax.putReq(constant.DHIS_URL_BASE+"/api/events/"+event.event,event,constant.auth,eventCreationCallback)
-               // eventCreationCallback(null,response,{message : "Ignoring update case"});                        
+               // ajax.putReq(constant.DHIS_URL_BASE+"/api/events/"+event.event,event,constant.auth,eventCreationCallback)
+                eventCreationCallback(null,response,{message : "Ignoring update case"});                        
            
             }
         }         

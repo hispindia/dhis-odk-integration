@@ -37,7 +37,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
 
-
+  
 /** Set Up Logging
  */ var winston = require('winston');
 global.__logger = new (winston.Logger)({
@@ -59,16 +59,20 @@ global.__logger = new (winston.Logger)({
 
 
 
-var server = app.listen(8000, function () {
+var server = app.listen(8001, function () {
     var host = server.address().address
     var port = server.address().port
 
     __logger.info("Server listening at http://%s:%s", host, port);
 
     var job = new CronJob({
-        cronTime: '00 59 23 * * *',
+        cronTime: '00 59 13 * * *',
         onTick: function() {
-            
+
+          //  var startDate = moment("12-31-2016", "MM-DD-YYYY");;
+          //  var endDate = moment();
+                
+        /*    
             new _dhis2odk().init(function(){
                 var startDate = moment("12-31-2016", "MM-DD-YYYY");;
                 //  startDate = startDate.setDate(startDate.getDate() - 50);            
@@ -76,7 +80,12 @@ var server = app.listen(8000, function () {
                 
                 new clusterHistoric(startDate,endDate);
             });
-            
+          */  
+            //new clusterHistoric(startDate,endDate);
+
+            var reportSender = require('./sendReports');            
+            reportSender.init();
+
         },
         start: false,
         runOnInit : true
