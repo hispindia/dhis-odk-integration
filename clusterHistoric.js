@@ -1,6 +1,6 @@
 module.exports =  clusterHistoric;
 
-var thresholdAlerts = require('./threshold-alerts1');
+var thresholdAlerts = require('./threshold-alerts');
 var moment = require("moment");
 var MomentRange = require('moment-range');
 moment = MomentRange.extendMoment(moment);

@@ -15,7 +15,7 @@ function dhis2odk(param){
 
    
     var dataElementsCodeMap = [];
-    var _index = -1;
+    var _index = 2;
     var _formList;
 
     this.init = function(mainCallback){

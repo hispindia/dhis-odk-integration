@@ -28,7 +28,7 @@ _.prepareUID = function(options,ids){
     var sha1 = require('js-sha1');
     var uid = sha1(ids.sort());
 
-    return "CL"+uid.substr(0,9);
+    return "C"+uid.substr(0,10);
 }
 /*
   _.flattenMap = function(data,delimiter){

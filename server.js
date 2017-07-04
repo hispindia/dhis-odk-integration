@@ -1,43 +1,9 @@
-var express = require('express');
-var http = require('http');
-var request = require('request');
 var _dhis2odk = require('./dhis2odk');
 var constant=require("./CONSTANTS");
 var CronJob = require('cron').CronJob;
-var thresholdAlerts = require('./threshold-alerts1');
 var clusterHistoric = require('./clusterHistoric');
 var moment = require("moment");
 
-// Initialise
-var app = express();
-
-
-
-/**
- * Set up CORS Settings
- */ app.use(function (req, res, next) {
-
-     // Website you wish to allow to connect
-     res.setHeader('Access-Control-Allow-Origin', '*');
-
-     // Request methods you wish to allow
-     res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
-
-     // Request headers you wish to allow
-     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-     // Pass to next layer of middleware
-     next();
- });/**
-     */
-
-var bodyParser = require('body-parser')
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-    extended: true
-}));
-
-  
 /** Set Up Logging
  */ var winston = require('winston');
 global.__logger = new (winston.Logger)({
@@ -57,42 +23,34 @@ global.__logger = new (winston.Logger)({
  */
 
 
+__logger.info("Starting service");
 
+var job = new CronJob({
+    cronTime: '00 59 13 * * *',
+    onTick: function() {
 
-var server = app.listen(8001, function () {
-    var host = server.address().address
-    var port = server.address().port
+          //var startDate = moment("12-31-2016", "MM-DD-YYYY");;
+          //var endDate = moment();
+        
+            
+              new _dhis2odk().init(function(){
+              var startDate = moment("12-31-2016", "MM-DD-YYYY");;
+              //  startDate = startDate.setDate(startDate.getDate() - 50);            
+              var endDate = moment();
+              
+              new clusterHistoric(startDate,endDate);
+              });
+          
+        //new clusterHistoric(startDate,endDate);
 
-    __logger.info("Server listening at http://%s:%s", host, port);
+     //   var reportSender = require('./sendReports');            
+      //  reportSender.init();
 
-    var job = new CronJob({
-        cronTime: '00 59 13 * * *',
-        onTick: function() {
+    },
+    start: false,
+    runOnInit : true
+});
 
-          //  var startDate = moment("12-31-2016", "MM-DD-YYYY");;
-          //  var endDate = moment();
-                
-        /*    
-            new _dhis2odk().init(function(){
-                var startDate = moment("12-31-2016", "MM-DD-YYYY");;
-                //  startDate = startDate.setDate(startDate.getDate() - 50);            
-                var endDate = moment();
-                
-                new clusterHistoric(startDate,endDate);
-            });
-          */  
-            //new clusterHistoric(startDate,endDate);
-
-            var reportSender = require('./sendReports');            
-            reportSender.init();
-
-        },
-        start: false,
-        runOnInit : true
-    });
-
-    job.start();
-
-})
+job.start();
 
 

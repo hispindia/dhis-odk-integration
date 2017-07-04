@@ -9,33 +9,25 @@ var moment = require("moment");
 
 var format = "YYYY-MM-DD"; 
 
-var clusterID;
 function getClusterID(callback){
- /*   ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances?ouMode=DESCENDANTS&ou="+constant.DHIS_ROOT_OU_UID,constant.auth,function(error,reponse,body){
+    ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances?&page=1&totalPages=true&pageSize=1&program="+constant.CLUSTER_PROGRAM+"&ouMode=DESCENDANTS&ou="+constant.DHIS_ROOT_OU_UID,constant.auth,function(error,reponse,body){
         if (error){
             __logger.error("Get Cluster ID");
         }
         var body = JSON.parse(body);
           
-            clusterID = body.trackedEntityInstances.length;            
-     
-        callback()
+        callback( body.pager.total)
     })
-*/
-
-callback()
 }
 
 function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,callback){
-    getClusterID(function(){
+    getClusterID(function(clusterID){
         
         
         var startDate = new Date(cluster_tei.enrollments[0].enrollmentDate);
     //    startDate.setDate(startDate.getDate() - 7);            
         var endDate = new Date(cluster_tei.enrollments[0].enrollmentDate);
-
-
-        clusterID = moment(startDate).format(format);
+      
         cluster_tei.attributes.push({
             "attribute": constant.CLUSTER_TEA_CLUSTER_TYPE,
             "value": clusterType
@@ -58,7 +50,7 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
             "value": "FIXED"
         })
 
-        ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances?programStartDate="+moment(startDate).format(format)+"&programEndDate="+moment(endDate).format(format)+"&ou="+oneCaseEvent.orgUnit+"&program="+constant.CLUSTER_PROGRAM + "&filter="+constant.CLUSTER_TEA_CLUSTER_TYPE+":eq:"+clusterType+"&filter="+constant.CLUSTER_TEA_IS_ACTIVE + ":eq:true",constant.auth,getTEI)
+        ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances/"+cluster_tei.trackedEntityInstance,constant.auth,getTEI)
         
         function getTEI(error,response,body){
             
@@ -67,22 +59,21 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
                 return;
             }
             
-            var teis = JSON.parse(body);
-            if (teis.trackedEntityInstances.length == 0){
+            var response = JSON.parse(body);
+            
+            if (response.httpStatus == "Not Found"){
                 cluster_tei.attributes.push({
                     "attribute": constant.CLUSTER_TEA_CLUSTERID,
-                    "value": "CLUSTER_"+(clusterID)
+                    "value": "CLUSTER"+clusterID+ "_"+moment(startDate).format(format)
                 })
                 makeNewTEI();
-            }else{
+            }else{callback(); return;
                 cluster_tei.attributes.push({
                     "attribute": constant.CLUSTER_TEA_CLUSTERID,
-                    "value": "CLUSTER_"+clusterID
-                })
-                var clusterUID = teis.trackedEntityInstances[0].trackedEntityInstance;
-                cluster_tei.trackedEntityInstance = clusterUID;
+                    "value": "CLUSTER"+(clusterID-1) + "_"+moment(startDate).format(format)
+                })              
                 
-                ajax.putReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances/"+clusterUID,cluster_tei,constant.auth,function(error,response,body){
+                ajax.putReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances/"+cluster_tei.trackedEntityInstance,cluster_tei,constant.auth,function(error,response,body){
                     if (error){
                         __logger.error("Update Cluster")
                     }
