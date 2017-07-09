@@ -19,6 +19,7 @@
   "homepage": "https://github.com/hispindia/dhis-odk-integration#readme",
   "dependencies": {
     "cron": "^1.2.1",
+    "deepmerge": "^1.5.0",
     "digest-auth-request": "^0.6.2",
     "jquery": "^3.2.1",
     "js-sha1": "^0.4.1",

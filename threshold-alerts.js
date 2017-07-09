@@ -79,14 +79,19 @@ function thresholdAlerts(param){
             var cases = ouMap[index.value];
             
             doAFIAndLab(index.value,cases,date,function(){
-                doADD(index.value,cases,date,function(){
-                    examineFacility();
-                })
+                setTimeout(function(){// this because API giving same total count sometimes for TEI
+                    doADD(index.value,cases,date,function(){
+                        setTimeout(function(){    
+                            examineFacility();
+                        },10)
+                    })
+                },10)                
             })
             
         }
-
+        
         function doAFIAndLab(ouId,ouEvents,clusterDate,callback){
+            var ouEventsMap = utility.prepareIdToObjectMap(ouEvents,"event");
             var clusterFound = false;
             var cluster_tei = {
                 "trackedEntity" : constant.DHIS_CLUSTER_TRACKED_ENTITY_UID,
@@ -134,22 +139,42 @@ function thresholdAlerts(param){
                 callback()
                 return;
             }
-            
+             
             // Make UID for TEI by hashing all cases UIDs 
             cluster_tei.trackedEntityInstance = utility.prepareUID(null,total_cases);
-            
-            
-            var clusterEvents = makeClusterEvents(total_cases,ouId,clusterDate);
-            cluster_tei.attributes.push({
-                "attribute": constant.CLUSTER_TEA_CASES_UIDS,
-                "value": utility.reduce(clusterEvents,"event",";")
-            })
+          
+            var clusterEvents = makeClusterEvents(total_cases,ouId,clusterDate,ouEventsMap);
+
+            addAttributes(cluster_tei,clusterEvents);
             
             new trackerSaver(cluster_tei,clusterEvents,ouEvents[0],"AFI",callback);
             
         }
+       
+        function addAttributes(cluster_tei,clusterEvents){
+          
+            var outliers = utility.getMaxMinFromList(clusterEvents,"eventDate");
+            
+            cluster_tei.attributes.push({
+                "attribute": constant.CLUSTER_TEA_CASES_UIDS,
+                "value": utility.reduce(clusterEvents,"event",";")
+            })
+            cluster_tei.attributes.push({
+                "attribute": constant.CLUSTER_TEA_CLUSTER_TAIL_DATE,
+                "value": moment(outliers.max).format(format)
+            })
+            cluster_tei.attributes.push({
+                "attribute": constant.CLUSTER_TEA_CLUSTER_INDEX_DATE,
+                "value": moment(outliers.min).format(format)
+            })
+            cluster_tei.enrollments[0].incidentDate = moment(outliers.min).format(format);
+            cluster_tei.enrollments[0].enrollmentDate = moment(outliers.min).format(format);
+            
         
+        }
         function doADD(ouId,ouEvents,clusterDate,callback){
+            var ouEventsMap = utility.prepareIdToObjectMap(ouEvents,"event");
+
             var clusterFound = false;
             var cluster_tei = {
                 "trackedEntity" : constant.DHIS_CLUSTER_TRACKED_ENTITY_UID,
@@ -180,22 +205,19 @@ function thresholdAlerts(param){
                 callback()
                 return;
             }
-
+            
             // Make UID for TEI by hashing all cases UIDs 
             cluster_tei.trackedEntityInstance = utility.prepareUID(null,total_cases);
-
-            var clusterEvents = makeClusterEvents(total_cases,ouId,clusterDate);
-            cluster_tei.attributes.push({
-                "attribute": constant.CLUSTER_TEA_CASES_UIDS,
-                "value": utility.reduce(clusterEvents,"event",";")
-            })
             
+            var clusterEvents = makeClusterEvents(total_cases,ouId,clusterDate,ouEventsMap);
+
+            addAttributes(cluster_tei,clusterEvents);
             new trackerSaver(cluster_tei,clusterEvents,ouEvents[0],"ADD",callback);
             
         }
     }
 
-    function makeClusterEvents(patientEvents,ouId,clusterDate){
+    function makeClusterEvents(patientEvents,ouId,clusterDate,ouEventsMap){
         var events = [];
         var patientEventsMap = [];
         
@@ -214,7 +236,7 @@ function thresholdAlerts(param){
                     dataElement : constant.CLUSTER_DE_CASE_TEI_UID,
                     value : caseUID
                 }],
-                eventDate : clusterDate,
+                eventDate : ouEventsMap[caseUID].eventDate,
                 event : caseUID
             }
             events.push(event);                    

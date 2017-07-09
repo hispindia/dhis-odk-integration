@@ -86,12 +86,18 @@ function dhis2odk(param){
                 
                 var instanceList = JSON.parse(x2js.toJson(body));
                 instanceList = instanceList.idChunk.idList.id;
-
+              //  filterInstanceList(instanceList,function(){    })
                 new mainODKMotor(instanceList,dataElementsCodeMap,formId,odk_qustion_prefix_id,formBinds,function( ){
                     
                     odkRotor();
                 })
             }
+            
+        }
+        
+        function filterInstanceList(instanceList,callback){
+          //  ajax.getReq(constant.DHIS_URL_BASE+"/api/events?&ouMode=DESCENDANTS&ou="+constant.DHIS_ROOT_OU_UID+,constant.auth,function(){ });
+
             
         }
     }

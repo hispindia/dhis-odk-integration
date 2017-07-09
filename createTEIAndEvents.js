@@ -6,6 +6,7 @@ var constant=require("./CONSTANTS");
 var utility = require('./utility-functions');
 var _ = require('underscore')._;
 var moment = require("moment");
+var merge = require('deepmerge');
 
 var format = "YYYY-MM-DD"; 
 
@@ -15,7 +16,7 @@ function getClusterID(callback){
             __logger.error("Get Cluster ID");
         }
         var body = JSON.parse(body);
-          
+   //       if (body.pager.total == 98){debugger}
         callback( body.pager.total)
     })
 }
@@ -25,7 +26,7 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
         
         
         var startDate = new Date(cluster_tei.enrollments[0].enrollmentDate);
-    //    startDate.setDate(startDate.getDate() - 7);            
+        startDate.setDate(startDate.getDate() - 7);            
         var endDate = new Date(cluster_tei.enrollments[0].enrollmentDate);
       
         cluster_tei.attributes.push({
@@ -50,8 +51,14 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
             "value": "FIXED"
         })
 
-        ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances/"+cluster_tei.trackedEntityInstance,constant.auth,getTEI)
+       // ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances/"+cluster_tei.trackedEntityInstance,constant.auth,getTEI)
         
+        ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances?programStartDate="+moment(startDate).format(format)+
+                    "&programEndDate="+moment(endDate).format(format)+"&ou="+oneCaseEvent.orgUnit+"&program="+constant.CLUSTER_PROGRAM + 
+                    "&filter="+constant.CLUSTER_TEA_CLUSTER_TYPE+":eq:"+clusterType+
+                    "&filter="+constant.CLUSTER_TEA_IS_ACTIVE + ":eq:true"+
+                    "&filter="+constant.CLUSTER_TEA_CLUSTER_METHOD+":eq:FIXED",constant.auth,getTEI)
+      
         function getTEI(error,response,body){
             
             if (error){
@@ -61,17 +68,18 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
             
             var response = JSON.parse(body);
             
-            if (response.httpStatus == "Not Found"){
+            if (response.trackedEntityInstances.length == 0){
+                
                 cluster_tei.attributes.push({
                     "attribute": constant.CLUSTER_TEA_CLUSTERID,
-                    "value": "CLUSTER"+clusterID+ "_"+moment(startDate).format(format)
+                    "value": "CLUSTER"+clusterID+ "_"+cluster_tei.enrollments[0].enrollmentDate
                 })
+                
                 makeNewTEI();
-            }else{callback(); return;
-                cluster_tei.attributes.push({
-                    "attribute": constant.CLUSTER_TEA_CLUSTERID,
-                    "value": "CLUSTER"+(clusterID-1) + "_"+moment(startDate).format(format)
-                })              
+            
+            }else{
+              
+                cluster_tei = doMerging(cluster_tei,response.trackedEntityInstances[0]);
                 
                 ajax.putReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances/"+cluster_tei.trackedEntityInstance,cluster_tei,constant.auth,function(error,response,body){
                     if (error){
@@ -85,6 +93,45 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
 
             }
             
+        }
+
+        function doMerging(current,old){
+            //current.trackedEntityInstance = old.trackedEntityInstance;
+            
+            delete old.enrollments;
+            var new_casesUID = utility.findValueAgainstId(current.attributes,"attribute",constant.CLUSTER_TEA_CASES_UIDS,"value");
+            var old_casesUID = utility.findValueAgainstId(old.attributes,"attribute",constant.CLUSTER_TEA_CASES_UIDS,"value");
+            
+            new_casesUID = new_casesUID.split(";");
+            old_casesUID = old_casesUID.split(";");
+            var mergedCases = [];
+            for (var key in new_casesUID){
+                if (new_casesUID[key] == ""){continue}
+                mergedCases[new_casesUID[key]] = true;
+            }
+
+            for (var key in old_casesUID){
+                if (old_casesUID[key] == ""){continue}
+                mergedCases[old_casesUID[key]] = true;
+            }
+            var mergedCaseUIDs = utility.reduceMapByKey(mergedCases,";");
+            utility.putValueAgainstId(current.attributes,"attribute",constant.CLUSTER_TEA_CASES_UIDS,"value",mergedCaseUIDs);
+            
+            for (var i=0;i<current.attributes.length;i++){
+                
+                if (current.attributes[i].attribute == constant.CLUSTER_TEA_CLUSTER_INDEX_DATE){continue};
+                if (current.attributes[i].attribute == constant.CLUSTER_TEA_CLUSTERID){continue};
+
+                var attrObj = current.attributes[i];
+                var value = utility.findValueAgainstId(old.attributes,"attribute",attrObj.attribute,"value");
+                if (value){
+                    utility.putValueAgainstId(old.attributes,"attribute",attrObj.attribute,"value",attrObj.value);
+                }else{
+                    old.attributes.push(attrObj);
+                }
+            }
+        
+            return old;            
         }
 
         function makeNewTEI(){

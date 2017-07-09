@@ -24,10 +24,12 @@ _.prepareMapGroupedById= function(object,id){
 }
 
 _.prepareUID = function(options,ids){
-    
+   
     var sha1 = require('js-sha1');
-    var uid = sha1(ids.sort());
+    var sortedIds = ids.sort();
+    var uid = sha1(sortedIds.join(";"));
 
+ //   console.log("uid="+uid+","+ids.toString());
     return "C"+uid.substr(0,10);
 }
 /*
@@ -129,6 +131,27 @@ _.findValueAgainstId = function (data,idKey,id,valKey){
     return null;
 }
 
+_.putValueAgainstId = function (data,idKey,id,valKey,value){
+
+    for (var i=0;i<data.length;i++){
+        if (data[i][idKey]==id){
+            return data[i][valKey]
+        }
+    }
+    return null;
+}
+
+
+_.findObjectAgainstId = function (data,idKey,id){
+
+    for (var i=0;i<data.length;i++){
+        if (data[i][idKey]==id){
+            return data[i]
+        }
+    }
+    return null;
+}
+
 
 _.checkListForValue = function (data,idKey,id,valKey,values){
     for (var i=0;i<data.length;i++){
@@ -149,5 +172,28 @@ _.reduce = function(list,id,seperator){
         accumlator = accumlator + list[key][id] + seperator;
     }
     return accumlator;
+}
+
+_.reduceMapByKey = function(map,seperator){
+    var accumlator = "";
+    for (var key in map){
+        accumlator = accumlator + key + seperator;
+    }
+    return accumlator;
+}
+
+_.getMaxMinFromList = function(list,id){
+
+    var result = {max : null,min:null};
+
+    for (var key in list){
+        if (!result.max){result.max = list[key][id]}
+        if (!result.min){result.min = list[key][id]}
+
+        if (result.max < list[key][id]){result.max = list[key][id]}
+        if (result.min > list[key][id]){result.min = list[key][id]}
+
+    }
+    return result;
 }
 module.exports = _;

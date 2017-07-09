@@ -27,6 +27,7 @@ function clusterHistoric(startDate,endDate){
             return
         }
         
+        __logger.info("Making cluster for Start Date[" + index.value+"]");
         var alerts = new thresholdAlerts({startDate : index.value});
         alerts.init(function(){
             makeClusters();
