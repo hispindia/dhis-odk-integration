@@ -1,4 +1,5 @@
 const phantom = require('phantom');
+var ajax = require("./ajax");
 const moment  = require('moment');
 const phantomReport  = require('./phantomReport');
 var constant=require("./CONSTANTS");
@@ -45,8 +46,37 @@ function reportSender(){
           */
 
     }
-
-   
+    
+    this.makeClusterInformationReportAndSendEmail = function(name,tei,ou,callback){
+            
+        var base = "http://localhost:8090/dhis";
+        ajax.getReq(base+"/api/users?fields=id,name,email&filter=dataViewOrganisationUnits.id:eq:"+ou+"&paging=false",constant.auth, function (error, response, body) {
+	    if (error){
+                console.log("Error user email fetch")
+                return
+            }
+            
+            var users = JSON.parse(body).users;
+            var emailStr = "";
+            for (var key in users){
+                emailStr = emailStr + users[key].email + ",";
+            }
+            emailStr = emailStr.substr(0,emailStr.length-1);
+            var reportPathAndName= DEST_PATH_BASE + name;
+            var emailUrl =  base+"/dhis-web-maintenance-dataadmin/sendEmail.action?subject=Cluster%20Information%20Report%20&body=Dear%20Sir,%20PFA%20report.%20Thanks&attachmentLocation="+reportPathAndName+"&email_address_to="+emailStr+"&email_address_cc="+emailStr;
+            
+            new phantomReport( {
+                BASE_URL : BASE_URL,
+                REPORT_URL : "dhis-web-reporting/generateHtmlReport.action?uid="+constant.Reports.ClusterInformation.id+"&tei"+tei,
+                OUTPUT_PATH : DEST_PATH_BASE+name,
+                EMAIL_URL : emailUrl
+            },function(reportPathAndName,emailURL){
+                
+                
+            })    
+           
+        });        
+    }
 }
 
 

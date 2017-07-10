@@ -47,14 +47,39 @@ function phantomReport(param,callback){
                     
                 })
                 var reportPathAndName = param.OUTPUT_PATH;
-                page.property('onLoadFinished', function(status,reportPathAndName,callback) {
+                var emailURL = param.EMAIL_URL;
+
+                page.property('onLoadFinished', function(status,reportPathAndName,emailURL,callback) {
                     console.log('==== onLoadFinished()');
                     try{
 
                         console.log('  status: ' + status );
                         // Render Report as PDF
+                        console.log('  Report: ' + reportPathAndName );
+
                         this.render(reportPathAndName);
-                        callback("Done");
+                        if (emailURL){
+                            var process = require("child_process")
+                            var spawn = process.spawn
+                            var execFile = process.execFile
+                            
+                            var child = spawn("node", ["nodeEmailReport.js", emailURL])
+                            
+                            child.stdout.on("data", function (data) {
+                                console.log("spawnSTDOUT:", JSON.stringify(data))
+                            })
+                            
+                            child.stderr.on("data", function (data) {
+                                console.log("spawnSTDERR:", JSON.stringify(data))
+                            })
+                            
+                            child.on("exit", function (code) {
+                                console.log("spawnEXIT:", code)
+                            })
+                            
+                            //child.kill("SIGKILL")
+                          
+                        }
                     }catch(ex){
                         var fullMessage = "\nJAVASCRIPT EXCEPTION";
                         fullMessage += "\nMESSAGE: " + ex.toString();
@@ -63,7 +88,7 @@ function phantomReport(param,callback){
                         }
                         console.log(fullMessage);
                     }
-                },reportPathAndName,callback);
+                },reportPathAndName,emailURL,callback);
             }catch(ex){
                 var fullMessage = "\nJAVASCRIPT EXCEPTION";
                 fullMessage += "\nMESSAGE: " + ex.toString();
