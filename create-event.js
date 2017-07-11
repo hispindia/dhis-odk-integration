@@ -6,6 +6,7 @@ var ajax = require("./ajax");
 var constant=require("./CONSTANTS");
 var utility = require('./utility-functions');
 var _ = require('underscore')._;
+var moment = require("moment");
 
 
 function createEvent(data,dataElementsCodeMap,formId,callback){
@@ -54,7 +55,7 @@ function createEvent(data,dataElementsCodeMap,formId,callback){
         }
 
         if (key == constant.eventDateKey){
-            event.eventDate = data[key];            
+            event.eventDate = moment(new Date(data[key])).format("YYYY-MM-DD");          
         }
 
         if (key == constant.eventUIDKey){
@@ -106,8 +107,8 @@ function createEvent(data,dataElementsCodeMap,formId,callback){
                 __logger.info("Event with UID ["+event.event+"] already exists.");
                 body.message = "Event already exists";
                 
-              //  ajax.putReq(constant.DHIS_URL_BASE+"/api/events/"+event.event,event,constant.auth,eventCreationCallback)
-                eventCreationCallback(null,response,{message : "Ignoring update case"});                        
+                ajax.putReq(constant.DHIS_URL_BASE+"/api/events/"+event.event,event,constant.auth,eventCreationCallback)
+              //  eventCreationCallback(null,response,{message : "Ignoring update case"});                        
            
             }
         }         

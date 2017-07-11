@@ -102,7 +102,7 @@ var job = new CronJob({
 
     },
     start: false,
-    runOnInit : false
+    runOnInit : true
 });
 
 job.start();

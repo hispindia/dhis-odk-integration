@@ -15,7 +15,7 @@ function dhis2odk(param){
 
    
     var dataElementsCodeMap = [];
-    var _index = 2;
+    var _index = -1;
     var _formList;
 
     this.init = function(mainCallback){
@@ -40,6 +40,8 @@ function dhis2odk(param){
             }
             
             var forms = x2js.toJson(body);
+            __logger.debug("FormList : "+body);            
+
             forms = JSON.parse(forms);
             forms = forms.forms.form;
             _formList = underscore.map(forms,function(form){
@@ -86,19 +88,44 @@ function dhis2odk(param){
                 
                 var instanceList = JSON.parse(x2js.toJson(body));
                 instanceList = instanceList.idChunk.idList.id;
-              //  filterInstanceList(instanceList,function(){    })
-                new mainODKMotor(instanceList,dataElementsCodeMap,formId,odk_qustion_prefix_id,formBinds,function( ){
-                    
+                filterInstanceList(instanceList,function(filteredInstanceList){  
+                    new mainODKMotor(filteredInstanceList,dataElementsCodeMap,formId,odk_qustion_prefix_id,formBinds,function( ){      
                     odkRotor();
+                    })
                 })
+                
             }
             
         }
         
         function filterInstanceList(instanceList,callback){
-          //  ajax.getReq(constant.DHIS_URL_BASE+"/api/events?&ouMode=DESCENDANTS&ou="+constant.DHIS_ROOT_OU_UID+,constant.auth,function(){ });
+            ajax.getReq(constant.DHIS_URL_BASE+"/api/events?&program="+constant.eventProgram+"&fields=event&skipPaging=true",constant.auth,function(error,response,body){
+                if (error){
+                    __logger.error("Fetch Events (filter)")
+                }
+                
+                var events = JSON.parse(body).events;
+                var eventMap = utility.prepareKeyMap(events,"event",true);
+                var filteredIIDs = [];
+                var filteredIIDsMap = [];
 
-            
+                for (var i=0;i<instanceList.length;i++){
+                    var iid = instanceList[i];
+                    
+                    if (!eventMap[prepareUID(iid)] && !filteredIIDsMap[iid]){
+                        filteredIIDs.push(iid)
+                        filteredIIDsMap[iid] = true;
+                    }
+                }
+                
+                callback(filteredIIDs);
+                
+            });
+
+            function prepareUID(data){
+                var key = data.substring(data.length-10,data.length);
+                return "O"+key;
+            }   
         }
     }
     

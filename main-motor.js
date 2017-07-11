@@ -38,8 +38,12 @@ debugger
             if (error){
                 __logger.error("Fetch Instance Data");
             }
-            __logger.debug("Got instance data for ID["+instanceId+"]")
+            __logger.debug("Got instance data for ID["+instanceId+"]->[" +body+"]" )
 
+            if (!body){
+                fetchInstanceData();
+                return
+            }
             var odkFormData = JSON.parse(x2js.toJson(body));
             
             var data = odkFormData.submission.data[odk_question_prefix_id];

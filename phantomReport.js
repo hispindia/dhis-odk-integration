@@ -27,8 +27,23 @@ function phantomReport(param,callback){
                     console.log('= onResourceRequested()');
                     //  console.log('  request: ' + JSON.stringify(request, undefined, 4));
                 });
+                /*
+                page.property("paperSize", {
+                    format: 'A4',
+                    orientation: 'landscape',
+                    margin: '1cm',
+                    header: {
+                        height : '2cm',
+                        contents : phantom.callback(function(pageNum, numPages){
+                            return "<span>" + pageNum + "/" + numPages + "</span>";
+                        })
+                    }
+                    
+                });*/
                 
-                gotPage(page);               
+                page.property('viewportSize', {width: 1280, height: 1024});
+                
+                gotPage(page);
             });
         });
     }
@@ -37,8 +52,8 @@ function phantomReport(param,callback){
         page.open(param.BASE_URL + param.REPORT_URL).then(function(status) {
             console.log(status);
             try{
-                page.evaluate(function(){      
-                    setTimeout(function(){
+                page.evaluate(function(){   
+                      setTimeout(function(){
 
                         document.getElementById("j_username").value = "admin";
                         document.getElementById("j_password").value = "district";
@@ -59,43 +74,45 @@ function phantomReport(param,callback){
                             console.log('  status: ' + status );
                             // Render Report as PDF
                             console.log('  Report: ' + reportPathAndName );
-
-                            thiz.render(reportPathAndName);
-                            if (emailURL){
-                                var process = require("child_process")
-                                var spawn = process.spawn
-                                var execFile = process.execFile
+                              window.setTimeout(function () {
+                                if (emailURL){
+                                  var process = require("child_process")
+                                  var spawn = process.spawn
+                                  var execFile = process.execFile
+                                  
+                                  var child = spawn("node", ["nodeEmailReport.js", emailURL])
+                                  
+                                  child.stdout.on("data", function (data) {
+                                      console.log("spawnSTDOUT:", JSON.stringify(data))
+                                  })
+                                  
+                                  child.stderr.on("data", function (data) {
+                                      console.log("spawnSTDERR:", JSON.stringify(data))
+                                  })
                                 
-                                var child = spawn("node", ["nodeEmailReport.js", emailURL])
-                                
-                                child.stdout.on("data", function (data) {
-                                    console.log("spawnSTDOUT:", JSON.stringify(data))
-                                })
-                                
-                                child.stderr.on("data", function (data) {
-                                    console.log("spawnSTDERR:", JSON.stringify(data))
-                                })
-                                
-                                child.on("exit", function (code) {
-                                    console.log("spawnEXIT:", code)
-                                })
-                                
-                                //child.kill("SIGKILL")
-                                
-                            }
-                        }catch(ex){
-                            var fullMessage = "\nJAVASCRIPT EXCEPTION";
+                                  child.on("exit", function (code) {
+                                      console.log("spawnEXIT:", code)
+                                  })
+                                  
+                                  //child.kill("SIGKILL")
+                                  
+                              }
+                              }, 200);
+                              thiz.render(reportPathAndName);
+                             
+                          }catch(ex){
+                              var fullMessage = "\nJAVASCRIPT EXCEPTION";
                             fullMessage += "\nMESSAGE: " + ex.toString();
-                            for (var p in ex) {
-                                fullMessage += "\n" + p.toUpperCase() + ": " + ex[p];
-                            }
-                            console.log(fullMessage);
-                        }
+                              for (var p in ex) {
+                                  fullMessage += "\n" + p.toUpperCase() + ": " + ex[p];
+                              }
+                              console.log(fullMessage);
+                          }
                         }
                     }
                     
                     var fii = foo(this);
-                    setTimeout(fii,3000)
+                    setTimeout(fii,5000)
                     
                 },reportPathAndName,emailURL,callback);
             }catch(ex){

@@ -12,6 +12,14 @@ _.prepareIdToObjectMap = function(object,id){
     return map;
 }
 
+_.prepareKeyMap = function(object,id,value){
+    var map = [];
+    for (var i=0;i<object.length;i++){
+        map[object[i][id]] = value;
+    }
+    return map;
+}
+
 _.prepareMapGroupedById= function(object,id){
     var map = [];
     for (var i=0;i<object.length;i++){
