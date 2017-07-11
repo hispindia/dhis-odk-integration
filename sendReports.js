@@ -5,7 +5,7 @@ const phantomReport  = require('./phantomReport');
 var constant=require("./CONSTANTS");
 
 const BASE_URL = constant.DHIS_URL_BASE;
-const DEST_PATH_BASE = "/home/harsh/Desktop/sms/phantomjs/";
+const DEST_PATH_BASE = "/tomcat_nieodk/dhis_home/documents";
 const today = moment(new Date()).format("YYYY-MM-DD");
 
 
