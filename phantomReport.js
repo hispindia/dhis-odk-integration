@@ -33,7 +33,7 @@ function phantomReport(param,callback){
         });
     }
     function gotPage(page){
-       
+        
         page.open(param.BASE_URL + param.REPORT_URL).then(function(status) {
             console.log(status);
             try{
@@ -51,43 +51,52 @@ function phantomReport(param,callback){
 
                 page.property('onLoadFinished', function(status,reportPathAndName,emailURL,callback) {
                     console.log('==== onLoadFinished()');
-                    try{
+                    
+                    var foo = function(thiz){
+                        return function(){
+                          try{
 
-                        console.log('  status: ' + status );
-                        // Render Report as PDF
-                        console.log('  Report: ' + reportPathAndName );
+                            console.log('  status: ' + status );
+                            // Render Report as PDF
+                            console.log('  Report: ' + reportPathAndName );
 
-                        this.render(reportPathAndName);
-                        if (emailURL){
-                            var process = require("child_process")
-                            var spawn = process.spawn
-                            var execFile = process.execFile
-                            
-                            var child = spawn("node", ["nodeEmailReport.js", emailURL])
-                            
-                            child.stdout.on("data", function (data) {
-                                console.log("spawnSTDOUT:", JSON.stringify(data))
-                            })
-                            
-                            child.stderr.on("data", function (data) {
-                                console.log("spawnSTDERR:", JSON.stringify(data))
-                            })
-                            
-                            child.on("exit", function (code) {
-                                console.log("spawnEXIT:", code)
-                            })
-                            
-                            //child.kill("SIGKILL")
-                          
+                            thiz.render(reportPathAndName);
+                            if (emailURL){
+                                var process = require("child_process")
+                                var spawn = process.spawn
+                                var execFile = process.execFile
+                                
+                                var child = spawn("node", ["nodeEmailReport.js", emailURL])
+                                
+                                child.stdout.on("data", function (data) {
+                                    console.log("spawnSTDOUT:", JSON.stringify(data))
+                                })
+                                
+                                child.stderr.on("data", function (data) {
+                                    console.log("spawnSTDERR:", JSON.stringify(data))
+                                })
+                                
+                                child.on("exit", function (code) {
+                                    console.log("spawnEXIT:", code)
+                                })
+                                
+                                //child.kill("SIGKILL")
+                                
+                            }
+                        }catch(ex){
+                            var fullMessage = "\nJAVASCRIPT EXCEPTION";
+                            fullMessage += "\nMESSAGE: " + ex.toString();
+                            for (var p in ex) {
+                                fullMessage += "\n" + p.toUpperCase() + ": " + ex[p];
+                            }
+                            console.log(fullMessage);
                         }
-                    }catch(ex){
-                        var fullMessage = "\nJAVASCRIPT EXCEPTION";
-                        fullMessage += "\nMESSAGE: " + ex.toString();
-                        for (var p in ex) {
-                            fullMessage += "\n" + p.toUpperCase() + ": " + ex[p];
                         }
-                        console.log(fullMessage);
                     }
+                    
+                    var fii = foo(this);
+                    setTimeout(fii,3000)
+                    
                 },reportPathAndName,emailURL,callback);
             }catch(ex){
                 var fullMessage = "\nJAVASCRIPT EXCEPTION";

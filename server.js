@@ -85,12 +85,16 @@ var job = new CronJob({
     cronTime: '00 59 13 * * *',
     onTick: function() {
 
-        //   new _dhis2odk().init(function(){
-      //  var startDate = moment("10-01-2016", "MM-DD-YYYY");;
-       // var endDate = moment();
-        //new clusterHistoric(startDate,endDate);
-        
-        //    });
+           new _dhis2odk().init(function(){
+               var endDate = moment();
+               var startDate = moment();
+               startDate = startDate.setDate(startDate.getDate() - 1);            
+
+               //var startDate = moment("10-01-2016", "MM-DD-YYYY");;
+
+               new clusterHistoric(startDate,endDate);
+               
+           });
         
         
      //   var reportSender = require('./sendReports');            
@@ -98,7 +102,7 @@ var job = new CronJob({
 
     },
     start: false,
-    runOnInit : true
+    runOnInit : false
 });
 
 job.start();
