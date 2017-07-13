@@ -64,7 +64,7 @@ function reportSender(){
             var reportName,subject;
             var timeout = 1000;
 
-/*
+
             reportName = "DR1_ADD_"+date;
             subject = reportName;
             sendPhantomReport(
@@ -143,7 +143,6 @@ function reportSender(){
                 );
 
            
-*/
             reportName = "Daily_Summary_"+date;
             subject = reportName;
             sendPhantomReport(
@@ -153,14 +152,27 @@ function reportSender(){
                 subject,
                 body,
                 emailTO,
-                emailTO,
+                emailCC,
                 reportName,
                 ".pdf"
                 );
 
-///////////////////////////////////////////////////
-
-                
+/*
+            date = moment(date).format("YYYYMMDD");
+            reportName = "Preventive_And_Control_Measures_By_RRT_"+date;
+            subject = reportName;
+            sendPhantomReport(
+                BASE_URL,
+                "dhis-web-reporting/generateHtmlReport.action?uid=duaxAwBCQ0p&ou=mnbTnDyJ37p&date="+date,                
+                DEST_PATH_BASE ,
+                subject,
+                body,
+                emailTO,
+                emailCC,
+                reportName,
+                ".pdf"
+                );
+  */            
             });              
     }
     
