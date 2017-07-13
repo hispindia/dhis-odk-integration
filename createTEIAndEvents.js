@@ -97,6 +97,21 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
 
         function doMerging(current,old){
             //current.trackedEntityInstance = old.trackedEntityInstance;
+            var totalAttr = []
+            var currentAttrMap = []
+            for (var i in current.attributes){
+                currentAttrMap[current.attributes[i].attribute] = current.attributes[i].value;
+                totalAttr[current.attributes[i].attribute] = true;
+            }
+            var oldAttrMap = []
+            for (var i in old.attributes){
+                oldAttrMap[old.attributes[i].attribute] = old.attributes[i].value;
+                totalAttr[old.attributes[i].attribute] = true;
+            }
+
+            for (var i in totalAttr){               
+             //   console.log(i + " - [" + currentAttrMap[i] + " |||| " +oldAttrMap[i]+"]");                
+            }
             
             delete old.enrollments;
             var new_casesUID = utility.findValueAgainstId(current.attributes,"attribute",constant.CLUSTER_TEA_CASES_UIDS,"value");
@@ -130,12 +145,31 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
                     old.attributes.push(attrObj);
                 }
             }
-        
+
+            oldAttrMap = []
+            for (var i in old.attributes){
+                oldAttrMap[old.attributes[i].attribute] = old.attributes[i].value;
+                totalAttr[old.attributes[i].attribute] = true;
+            }
+            for (var i in totalAttr){               
+         //       console.log("> "+i + " - [" +oldAttrMap[i]+"]");                
+            }
+       //     console.log("-------------------------------------------")
             return old;            
         }
 
         function makeNewTEI(){
             
+            var oldAttrMap = [];
+            var totalAttr = [];
+            var old = cluster_tei;
+            for (var i in old.attributes){
+                oldAttrMap[old.attributes[i].attribute] = old.attributes[i].value;
+                totalAttr[old.attributes[i].attribute] = true;
+            }
+            for (var i in totalAttr){               
+             //   console.log("<> "+i + " - [" +oldAttrMap[i]+"]");                
+            }
             ajax.postReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances",cluster_tei,constant.auth,teiSave);
             
             function teiSave(error,response,body){

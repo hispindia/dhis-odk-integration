@@ -248,6 +248,7 @@ function thresholdAlerts(param){
     function thresholdViolation(events,days,cases,deUID,deVal,now){
         var count = 0;
         var found_events = [];
+        console.log("[[[[")
 
         for (var i=0;i<events.length;i++){
             var evDate = new Date(events[i].eventDate);
@@ -256,11 +257,19 @@ function thresholdAlerts(param){
             var dvs = events[i].dataValues;
             var val = utility.findValueAgainstId(dvs,"dataElement",deUID,"value");
             if (val == deVal){
+                console.log(events[i].event+"-"+moment(evDate).format("YYYY-MM-DD")+","+now + " diff="+diff + " val="+val)
                 found_events.push(events[i].event)                  
             }
         }
         
-        if (found_events.length >= cases){return found_events}
+        if (found_events.length >= cases){
+        console.log("Found"+found_events.length + "cases"+cases)
+        console.log("]]]]Found")
+
+            return found_events
+        }
+        console.log("]]]]")
+
         return false;
     }
 

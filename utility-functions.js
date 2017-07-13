@@ -143,7 +143,8 @@ _.putValueAgainstId = function (data,idKey,id,valKey,value){
 
     for (var i=0;i<data.length;i++){
         if (data[i][idKey]==id){
-            return data[i][valKey]
+            data[i][valKey] = value
+            return true
         }
     }
     return null;

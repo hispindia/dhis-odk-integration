@@ -55,7 +55,8 @@ function createEvent(data,dataElementsCodeMap,formId,callback){
         }
 
         if (key == constant.eventDateKey){
-            event.eventDate = moment(new Date(data[key])).format("YYYY-MM-DD");          
+            event.eventDate = moment(new Date(data[key])).format("YYYY-MM-DD");
+            data[key] = event.eventDate;
         }
 
         if (key == constant.eventUIDKey){
@@ -79,7 +80,7 @@ function createEvent(data,dataElementsCodeMap,formId,callback){
             __logger.error("POst Event ");                    
             return;
         }
-        __logger.info(""+body.message);                    
+        __logger.info(""+body.message + JSON.stringify(body));                    
         
         callback();
     });

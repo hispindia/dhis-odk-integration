@@ -39,12 +39,15 @@ function gotPage(page,url){
         try{
             page.evaluate(function(){      
                 setTimeout(function(){
-
                     document.getElementById("j_username").value = "admin";
                     document.getElementById("j_password").value = "district";
                     document.getElementById("submit").click();
                 },100)
                 
+                page.property('onLoadFinished', function() {
+                    phantom.exit();
+                })
+
             })
         }catch(ex){
             var fullMessage = "\nJAVASCRIPT EXCEPTION";

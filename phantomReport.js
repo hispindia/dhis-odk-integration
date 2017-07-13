@@ -91,6 +91,7 @@ function phantomReport(param,callback){
                                   })
                                 
                                   child.on("exit", function (code) {
+                                      phantom.exit();
                                       console.log("spawnEXIT:", code)
                                   })
                                   
@@ -112,7 +113,7 @@ function phantomReport(param,callback){
                     }
                     
                     var fii = foo(this);
-                    setTimeout(fii,5000)
+                    setTimeout(fii,10000)
                     
                 },reportPathAndName,emailURL,callback);
             }catch(ex){
