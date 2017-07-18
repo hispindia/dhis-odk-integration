@@ -85,20 +85,20 @@ var job = new CronJob({
     cronTime: '00 59 13 * * *',
     onTick: function() {
 
-        //   new _dhis2odk().init(function(){
-    /*           var endDate = moment();
+           new _dhis2odk().init(function(){
+               var endDate = moment();
                var startDate = new Date();
                startDate = startDate.setDate(startDate.getDate() - 1);            
 
-               startDate = moment("04-10-2017", "MM-DD-YYYY");;
+              // startDate = moment("04-01-2017", "MM-DD-YYYY");
 
                new clusterHistoric(startDate,endDate);
-      */         
-      //     });
+               
+           });
         
         
-        var reportSender = require('./sendReports');            
-        reportSender.init(moment("05-25-2017", "MM-DD-YYYY").format("YYYY-MM-DD"));
+       // var reportSender = require('./sendReports');            
+       // reportSender.init(moment("05-25-2017", "MM-DD-YYYY").format("YYYY-MM-DD"));
 
     },
     start: false,

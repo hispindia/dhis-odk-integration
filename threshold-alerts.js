@@ -248,11 +248,13 @@ function thresholdAlerts(param){
     function thresholdViolation(events,days,cases,deUID,deVal,now){
         var count = 0;
         var found_events = [];
+        now = moment(now).startOf("day");
+        
         console.log("[[[[")
 
         for (var i=0;i<events.length;i++){
             var evDate = new Date(events[i].eventDate);
-            var diff = moment(now).diff(evDate,'days');
+            var diff = moment(now).diff(moment(evDate).startOf('day'),'days');
             if (diff > days){continue}
             var dvs = events[i].dataValues;
             var val = utility.findValueAgainstId(dvs,"dataElement",deUID,"value");

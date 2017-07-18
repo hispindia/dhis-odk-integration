@@ -1,6 +1,4 @@
 const phantom = require('phantom');
-const moment  = require('moment');
-
 
 function phantomReport(param,callback){
 
