@@ -17,8 +17,9 @@ function dhis2odk(param){
     var dataElementsCodeMap = [];
     var _index = -1;
     var _formList;
-
+    var mainCallback;
     this.init = function(mainCallback){
+        this.mainCallback = mainCallback;
         fetchDHISMetadata(callback);
         
         function callback(){
@@ -47,11 +48,13 @@ function dhis2odk(param){
             _formList = underscore.map(forms,function(form){
                 return form.url.split("=")[1];
             })
-            odkRotor(mainCallback);       
+            odkRotor();       
         };        
     }
 
-    function odkRotor(mainCallback){
+    function odkRotor(){
+
+       
         _index = _index+1;
         if (_index == _formList.length){
             __logger.info("Finished importing all forms")

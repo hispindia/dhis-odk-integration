@@ -68,7 +68,7 @@ function createAndAssignDataElements(dataElementsCodeMap,data,formId,odk_questio
                 },
                 domainType:"TRACKER",
                 name:odkQuestion,
-                shortName:odkQuestionEndPointName +"_"+ Math.floor(Math.random()*999),
+                shortName:odkQuestionEndPointName.substring(0,45) +"_"+ Math.floor(Math.random()*999),
                 valueType: valueType
             }
 

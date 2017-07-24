@@ -16,7 +16,6 @@ function getClusterID(callback){
             __logger.error("Get Cluster ID");
         }
         var body = JSON.parse(body);
-   //       if (body.pager.total == 98){debugger}
         callback( body.pager.total)
     })
 }
@@ -51,10 +50,11 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
             "value": "FIXED"
         })
 
+        var tailDate = utility.findValueAgainstId(cluster_tei.attributes,"attribute",constant.CLUSTER_TEA_CLUSTER_TAIL_DATE,"value");
+
        // ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances/"+cluster_tei.trackedEntityInstance,constant.auth,getTEI)
         
-        ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances?programStartDate="+moment(startDate).format(format)+
-                    "&programEndDate="+moment(endDate).format(format)+"&ou="+oneCaseEvent.orgUnit+"&program="+constant.CLUSTER_PROGRAM + 
+        ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances?filter="+constant.CLUSTER_TEA_CLUSTER_TAIL_DATE+":ge:"+moment(endDate).format(format)+"&ou="+oneCaseEvent.orgUnit+"&program="+constant.CLUSTER_PROGRAM + 
                     "&filter="+constant.CLUSTER_TEA_CLUSTER_TYPE+":eq:"+clusterType+
                     "&filter="+constant.CLUSTER_TEA_IS_ACTIVE + ":eq:true"+
                     "&filter="+constant.CLUSTER_TEA_CLUSTER_METHOD+":eq:FIXED",constant.auth,getTEI)
@@ -136,7 +136,6 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
                 
                 if (current.attributes[i].attribute == constant.CLUSTER_TEA_CLUSTER_INDEX_DATE){continue};
                 if (current.attributes[i].attribute == constant.CLUSTER_TEA_CLUSTERID){continue};
-
                 var attrObj = current.attributes[i];
                 var value = utility.findValueAgainstId(old.attributes,"attribute",attrObj.attribute,"value");
                 if (value){

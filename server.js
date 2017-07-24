@@ -51,15 +51,12 @@ global.__logger = new (winston.Logger)({
 /**
  */
 
-
-
 var server = app.listen(8000, function () {
     var host = server.address().address
     var port = server.address().port
 
     __logger.info("Server listening at http://%s:%s", host, port);
- 
-
+    
 })
 
 
@@ -85,24 +82,23 @@ var job = new CronJob({
     cronTime: '00 59 13 * * *',
     onTick: function() {
 
-           new _dhis2odk().init(function(){
-               var endDate = moment();
-               var startDate = new Date();
-               startDate = startDate.setDate(startDate.getDate() - 1);            
+         new _dhis2odk().init(function(){
+           var endDate = moment();
+           var startDate = new Date();
+              startDate = startDate.setDate(startDate.getDate() - 1);            
+           //startDate = moment("10-01-2016", "MM-DD-YYYY");
 
-              // startDate = moment("04-01-2017", "MM-DD-YYYY");
-
-               new clusterHistoric(startDate,endDate);
-               
-           });
+           new clusterHistoric(startDate,endDate);
+           
+         });  
+          
         
-        
-       // var reportSender = require('./sendReports');            
-       // reportSender.init(moment("05-25-2017", "MM-DD-YYYY").format("YYYY-MM-DD"));
+        //  var reportSender = require('./sendReports');            
+        //  reportSender.init(moment("07-15-2017", "MM-DD-YYYY").format("YYYY-MM-DD"));
 
     },
     start: false,
-    runOnInit : true
+    runOnInit : false
 });
 
 job.start();

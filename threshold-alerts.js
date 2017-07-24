@@ -55,7 +55,11 @@ function thresholdAlerts(param){
             }
 
             var allCases = JSON.parse(body).events;
-            var fixedAlgoCases = filterEventsByDataValue(allCases,"dataElement",constant.DHIS_DE_ODK_FORMID,"value",["DPHL_Lab_V1","eDFSS_IPD_V3"])
+            var fixedAlgoCases = filterEventsByDataValue(allCases,"dataElement",constant.DHIS_DE_ODK_FORMID,"value",["DPHL_Lab_V1","eDFSS_IPD_V3"],"include");  
+            
+            // exclude duplicate cases
+            fixedAlgoCases = filterEventsByDataValue(fixedAlgoCases,"dataElement",constant.DHIS_DE_DUPLICATE_CASE,"value",["true"],"exclude");            
+
             var ouWiseCasesMap = utility.prepareMapGroupedById(fixedAlgoCases,"orgUnit");
             findClusters(ouWiseCasesMap,moment(endDate).format(format),callback);
             
@@ -83,9 +87,9 @@ function thresholdAlerts(param){
                     doADD(index.value,cases,date,function(){
                         setTimeout(function(){    
                             examineFacility();
-                        },10)
+                        },100)
                     })
-                },10)                
+                },100)                
             })
             
         }
@@ -250,7 +254,7 @@ function thresholdAlerts(param){
         var found_events = [];
         now = moment(now).startOf("day");
         
-        console.log("[[[[")
+        //console.log("[[[[")
 
         for (var i=0;i<events.length;i++){
             var evDate = new Date(events[i].eventDate);
@@ -259,28 +263,29 @@ function thresholdAlerts(param){
             var dvs = events[i].dataValues;
             var val = utility.findValueAgainstId(dvs,"dataElement",deUID,"value");
             if (val == deVal){
-                console.log(events[i].event+"-"+moment(evDate).format("YYYY-MM-DD")+","+now + " diff="+diff + " val="+val)
+          //      console.log(events[i].event+"-"+moment(evDate).format("YYYY-MM-DD")+","+now + " diff="+diff + " val="+val)
                 found_events.push(events[i].event)                  
             }
         }
         
         if (found_events.length >= cases){
-        console.log("Found"+found_events.length + "cases"+cases)
-        console.log("]]]]Found")
+        //console.log("Found"+found_events.length + "cases"+cases)
+       // console.log("]]]]Found")
 
             return found_events
         }
-        console.log("]]]]")
+     //   console.log("]]]]")
 
         return false;
     }
 
-    function filterEventsByDataValue(events,idKey,id,valKey,values){
-
+    function filterEventsByDataValue(events,idKey,id,valKey,values,operation){
         var list = [];
         for (var i=0;i<events.length;i++){
             if (utility.checkListForValue(events[i].dataValues,idKey,id,valKey,values)){
-                list.push(events[i]);
+                if (operation == "include")  list.push(events[i]);
+            }else{
+                if (operation == "exclude")  list.push(events[i]);
             }
         }
         return list;
