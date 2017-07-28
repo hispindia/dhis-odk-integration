@@ -1,4 +1,5 @@
 const phantom = require('phantom');
+var constant=require("./CONSTANTS");
 
 function phantomReport(param,callback){
 
@@ -54,7 +55,7 @@ function phantomReport(param,callback){
                       setTimeout(function(){
 
                         document.getElementById("j_username").value = "admin";
-                        document.getElementById("j_password").value = "district";
+                        document.getElementById("j_password").value = "Hisp@1234";
                         document.getElementById("submit").click();
                     },100)
                     
@@ -106,6 +107,8 @@ function phantomReport(param,callback){
                                   fullMessage += "\n" + p.toUpperCase() + ": " + ex[p];
                               }
                               console.log(fullMessage);
+                              console.log("11111111111111111111111111111111");
+
                           }
                         }
                     }
@@ -121,6 +124,8 @@ function phantomReport(param,callback){
                     fullMessage += "\n" + p.toUpperCase() + ": " + ex[p];
                 }
                 console.log(fullMessage);
+                console.log("222222222222222222222222");
+
             }
             
         });

@@ -44,6 +44,8 @@ function reportSender(){
         
         var attachmentLocation = DEST_PATH_BASE+reportName + fileFormat;
         var emailUrl =  BASE_URL+"/dhis-web-maintenance-dataadmin/sendEmail.action?subject="+subject+"&body="+body+"&attachmentLocation="+attachmentLocation+"&email_address_to="+to+"&email_address_cc="+cc;
+
+__logger.debug("Email Url -> "+emailUrl)
         setTimeout(function(){
             new phantomReport( {
                 BASE_URL :BASE_URL,
@@ -177,33 +179,62 @@ function reportSender(){
     }
     
     this.makeClusterInformationReportAndSendEmail = function(name,tei,ou,callback){
-            
-        ajax.getReq(BASE_URL+"/api/users?fields=id,name,email&filter=dataViewOrganisationUnits.id:eq:"+ou+"&paging=false",constant.auth, function (error, response, body) {
-	    if (error){
-                console.log("Error user email fetch")
-                return
-            }
-            
-            var users = JSON.parse(body).users;
-            var emailStr = "";
-            for (var key in users){
-                emailStr = emailStr + users[key].email + ",";
-            }
-            emailStr = emailStr.substr(0,emailStr.length-1);
-            var reportPathAndName= DEST_PATH_BASE + name;
-            var emailUrl =  BASE_URL+"/dhis-web-maintenance-dataadmin/sendEmail.action?subject=Cluster%20Information%20Report%20&body=Dear%20Sir,%20PFA%20report.%20Thanks&attachmentLocation="+reportPathAndName+"&email_address_to="+emailStr+"&email_address_cc="+emailStr;
-            
-            new phantomReport( {
-                BASE_URL : BASE_URL,
-                REPORT_URL : "dhis-web-reporting/generateHtmlReport.action?uid="+constant.Reports.ClusterInformation.id+"&tei="+tei,
-                OUTPUT_PATH : DEST_PATH_BASE+name,
-                EMAIL_URL : emailUrl
-            },function(reportPathAndName,emailURL){
+     
+        getEmailIdFromUserGroup(constant.EMAIL_GROUP_CC_UID,function(emailCC){
+            ajax.getReq(BASE_URL+"/api/organisationUnits/"+ou+"?fields=ancestors[users[id,name,email]]",constant.auth, function (error, response, body) {
+	        if (error){
+                    console.log("Error user email fetch")
+                    return
+                }
                 
+                var users = extractUsersFromOUCollection(JSON.parse(body).ancestors);
+                var emailStr = "";
+                for (var key in users){
+                    if (users[key].email){
+                        emailStr = emailStr + users[key].email + ",";
+                    }
+                }
+                emailStr = emailStr.substr(0,emailStr.length-1);
+                emailStr = emailCC;
+                var body = "Dear Sir/Madam ,<br/><br/> Please find attached report. <br/><br/><br/> Auto Generated Email<br/>";
+            var reportName,subject;
+                var timeout = Math.floor(Math.random()*5*60*1000);
+                __logger.debug("timeout - "+timeout)
                 
-            })    
-           
-        });        
+                reportName = "Cluster_Information_"+name;
+                subject = reportName;
+                sendPhantomReport(
+                    BASE_URL,
+                    "dhis-web-reporting/generateHtmlReport.action?uid="+constant.Reports.ClusterInformation.id+"&tei="+tei,                
+                    DEST_PATH_BASE ,
+                    subject,
+                    body,
+                    emailStr,
+                    emailCC,
+                    reportName,
+                    ".pdf",
+                    timeout
+                );
+              
+            });     
+            
+        })       
+        
+        
+        function extractUsersFromOUCollection(ous){
+            var users = [];
+            for (var key in ous){
+                if (ous[key]){
+                    if (ous[key].users){
+                        for (var userKey in ous[key].users){
+                            users.push(ous[key].users[userKey]);
+                        }
+                        
+                    }
+                }
+            }
+            return users;
+        }
     }
 }
 

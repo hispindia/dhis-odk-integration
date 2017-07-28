@@ -87,9 +87,9 @@ function thresholdAlerts(param){
                     doADD(index.value,cases,date,function(){
                         setTimeout(function(){    
                             examineFacility();
-                        },100)
+                        },10)
                     })
-                },100)                
+                },500)                
             })
             
         }

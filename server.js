@@ -5,6 +5,7 @@ var clusterHistoric = require('./clusterHistoric');
 var moment = require("moment");
 var express = require('express');
 
+var eventService = require('./updateEvent');
 
 
 // Initialise
@@ -81,24 +82,36 @@ __logger.info("Starting service");
 var job = new CronJob({
     cronTime: '00 59 13 * * *',
     onTick: function() {
-
-         new _dhis2odk().init(function(){
-           var endDate = moment();
-           var startDate = new Date();
-              startDate = startDate.setDate(startDate.getDate() - 1);            
-           //startDate = moment("10-01-2016", "MM-DD-YYYY");
-
-           new clusterHistoric(startDate,endDate);
-           
-         });  
-          
+        
+        new _dhis2odk().init(function(){
+            
+            eventService.getRecentEventDate(function(error,response,body){
+                if (error){
+                    __logger.error("Error Fetching latest date Event")
+                }
+                var events = JSON.parse(body).events;
+                
+                var endDate = moment();
+                var startDate = new Date();
+                startDate = moment("10-01-2016", "MM-DD-YYYY");
+                if (events.length >0){
+                    startDate = events[0].eventDate;
+                }
+                //  endDate = moment("10-10-2016", "MM-DD-YYYY");
+                
+                new clusterHistoric(startDate,endDate);
+                
+            })
+            
+        });  
+        
         
         //  var reportSender = require('./sendReports');            
         //  reportSender.init(moment("07-15-2017", "MM-DD-YYYY").format("YYYY-MM-DD"));
-
+        
     },
     start: false,
-    runOnInit : false
+    runOnInit : true
 });
 
 job.start();

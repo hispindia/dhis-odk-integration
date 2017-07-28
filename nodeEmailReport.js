@@ -40,13 +40,11 @@ function gotPage(page,url){
             page.evaluate(function(){      
                 setTimeout(function(){
                     document.getElementById("j_username").value = "admin";
-                    document.getElementById("j_password").value = "district";
+                    document.getElementById("j_password").value = "Hisp@1234";
                     document.getElementById("submit").click();
                 },100)
                 
-                page.property('onLoadFinished', function() {
-                    phantom.exit();
-                })
+           
 
             })
         }catch(ex){
@@ -56,12 +54,18 @@ function gotPage(page,url){
                 fullMessage += "\n" + p.toUpperCase() + ": " + ex[p];
             }
             console.log(fullMessage);
+            console.log("______________________________");
+
+            phantom.exit();
+            phantom.kill();
             }
+       
         page.property('onLoadFinished', function() {
-            console.log('==== onLoadFinished()');
+            console.log("++++++++++++++++++");
             
-        });
-        
+            phantom.exit();
+            phantom.kill();
+        })   
     });
     
 }

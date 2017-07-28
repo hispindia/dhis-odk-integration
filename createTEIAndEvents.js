@@ -7,7 +7,7 @@ var utility = require('./utility-functions');
 var _ = require('underscore')._;
 var moment = require("moment");
 var merge = require('deepmerge');
-
+var reportSender = require('./sendReports')
 var format = "YYYY-MM-DD"; 
 
 function getClusterID(callback){
@@ -24,9 +24,8 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
     getClusterID(function(clusterID){
         
         
-        var startDate = new Date(cluster_tei.enrollments[0].enrollmentDate);
-        startDate.setDate(startDate.getDate() - 7);            
         var endDate = new Date(cluster_tei.enrollments[0].enrollmentDate);
+        endDate.setDate(endDate.getDate() - 7);            
       
         cluster_tei.attributes.push({
             "attribute": constant.CLUSTER_TEA_CLUSTER_TYPE,
@@ -78,15 +77,23 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
                 makeNewTEI();
             
             }else{
-              
-                cluster_tei = doMerging(cluster_tei,response.trackedEntityInstances[0]);
                 
+                cluster_tei = doMerging(cluster_tei,getMaxTEI(response.trackedEntityInstances));
+                
+                if (!cluster_tei){ 
+                    __logger.debug("Update not needed; cases already present");
+                    callback();
+                    return;
+                }
                 ajax.putReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances/"+cluster_tei.trackedEntityInstance,cluster_tei,constant.auth,function(error,response,body){
                     if (error){
                         __logger.error("Update Cluster")
                     }
                     
                     __logger.info("Updated Cluster with UID -"+body.response.reference)
+                    var clusterID = utility.findValueAgainstId(cluster_tei.attributes,"attribute",constant.CLUSTER_TEA_CLUSTERID,"value");
+
+                    reportSender.makeClusterInformationReportAndSendEmail(clusterID ,cluster_tei.trackedEntityInstance,cluster_tei.orgUnit,function(){});
                     callback();
                     
                 });
@@ -95,6 +102,19 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
             
         }
 
+        function getMaxTEI(teis){
+           var maxDateTEI = teis[0];
+            for (var key in teis){
+                var tailDateMax = utility.findValueAgainstId(maxDateTEI.attributes,"attribute",constant.CLUSTER_TEA_CLUSTER_TAIL_DATE,"value");
+                var tailDate = utility.findValueAgainstId(teis[key].attributes,"attribute",constant.CLUSTER_TEA_CLUSTER_TAIL_DATE,"value");
+                if (tailDateMax < tailDate){
+                    maxDateTEI = teis[key];
+                }
+            
+            }
+            return maxDateTEI
+            
+        }
         function doMerging(current,old){
             //current.trackedEntityInstance = old.trackedEntityInstance;
             var totalAttr = []
@@ -118,7 +138,13 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
             var old_casesUID = utility.findValueAgainstId(old.attributes,"attribute",constant.CLUSTER_TEA_CASES_UIDS,"value");
             
             new_casesUID = new_casesUID.split(";");
+            if (!mergeIsNeeded(old_casesUID,new_casesUID)){
+                return null;
+            }
+
             old_casesUID = old_casesUID.split(";");
+        
+
             var mergedCases = [];
             for (var key in new_casesUID){
                 if (new_casesUID[key] == ""){continue}
@@ -155,6 +181,19 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
             }
        //     console.log("-------------------------------------------")
             return old;            
+        
+            function mergeIsNeeded(oldCasesString,newCasesList){
+                
+                for (var key in newCasesList){
+                    var eventUID = newCasesList[key];
+                    
+                    if (oldCasesString.indexOf(eventUID) == -1){
+                        return true
+                    }
+                
+                }
+                return false;
+            }
         }
 
         function makeNewTEI(){
@@ -170,16 +209,40 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
              //   console.log("<> "+i + " - [" +oldAttrMap[i]+"]");                
             }
             ajax.postReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances",cluster_tei,constant.auth,teiSave);
-            
+
+
+
             function teiSave(error,response,body){
                 if (error){
                     __logger.error("POst Cluster TEI");
                     return;
                 }
-                
+
+                var clusterID = utility.findValueAgainstId(cluster_tei.attributes,"attribute",constant.CLUSTER_TEA_CLUSTERID,"value");
+                var indexCaseDate = utility.findValueAgainstId(cluster_tei.attributes,"attribute",constant.CLUSTER_TEA_CLUSTER_INDEX_DATE,"value");
+
+                reportSender.makeClusterInformationReportAndSendEmail(clusterID,cluster_tei.trackedEntityInstance,cluster_tei.orgUnit,function(){});
+
                 __logger.info("Saved Cluster with UID -"+body.response.importSummaries[0].reference)
+                var indexEvent = {
+                    program : constant.CLUSTER_PROGRAM,
+                    programStage : constant.CLUSTER_PROGRAMSTAGE,
+                    orgUnit : cluster_tei.orgUnit,
+                    eventDate : indexCaseDate,
+                    trackedEntityInstance : cluster_tei.trackedEntityInstance
+                }
+                
+                ajax.postReq(constant.DHIS_URL_BASE+"/api/events",indexEvent,constant.auth,function(error,response,body){
+                    if (error){
+                        __logger.error("Error saving index Event");
+                    }
+                    
+                });
+
                 callback();
-            }                 
+            }
+
+           
         }
     })
 }
