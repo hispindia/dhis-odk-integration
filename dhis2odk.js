@@ -17,9 +17,9 @@ function dhis2odk(param){
     var dataElementsCodeMap = [];
     var _index = -1;
     var _formList;
-    var mainCallback;
+    var _mainCallback;
     this.init = function(mainCallback){
-        this.mainCallback = mainCallback;
+        _mainCallback = mainCallback;
         fetchDHISMetadata(callback);
         
         function callback(){
@@ -58,7 +58,7 @@ function dhis2odk(param){
         _index = _index+1;
         if (_index == _formList.length){
             __logger.info("Finished importing all forms")
-            mainCallback();
+            _mainCallback();
             return
         }
 
