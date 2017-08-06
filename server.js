@@ -88,7 +88,7 @@ app.get('/sendDailyReports', function(req, res){
         return;
     }
     var reportSender = require('./sendReports');            
-    reportSender.init(moment(date, "YYYY-MM-DD").format("YYYY-MM-DD"));
+    reportSender.init(moment(date, "MM-DD-YYYY").format("YYYY-MM-DD"));
 
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.end('ok');
@@ -129,7 +129,7 @@ var job = new CronJob({
         
     },
     start: false,
-    runOnInit : true
+    runOnInit : false
 });
 
 job.start();
