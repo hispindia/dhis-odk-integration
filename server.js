@@ -78,6 +78,24 @@ app.get('/sendClusterInformationReport', function(req, res){
 })
 
 
+// Open API for sending email for daily report
+app.get('/sendDailyReports', function(req, res){
+    var date = req.query.date
+
+    if (!date){
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.end('No date passed(YYYY-MM-DD)');
+        return;
+    }
+    var reportSender = require('./sendReports');            
+    reportSender.init(moment(date, "YYYY-MM-DD").format("YYYY-MM-DD"));
+
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end('ok');
+    
+})
+
+
 __logger.info("Starting service");
 var job = new CronJob({
     cronTime: '00 59 13 * * *',
