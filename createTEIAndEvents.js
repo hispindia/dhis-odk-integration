@@ -7,7 +7,8 @@ var utility = require('./utility-functions');
 var _ = require('underscore')._;
 var moment = require("moment");
 var merge = require('deepmerge');
-var reportSender = require('./sendReports')
+var reportSender = require('./sendReports');
+var eventUpdater = require('./eventUpdater');
 var format = "YYYY-MM-DD"; 
 
 function getClusterID(callback){
@@ -22,8 +23,7 @@ function getClusterID(callback){
 
 function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,callback){
     getClusterID(function(clusterID){
-        
-        
+                
         var endDate = new Date(cluster_tei.enrollments[0].enrollmentDate);
         endDate.setDate(endDate.getDate() - 7);            
       
@@ -53,11 +53,12 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
 
        // ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances/"+cluster_tei.trackedEntityInstance,constant.auth,getTEI)
         
-        ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances?filter="+constant.CLUSTER_TEA_CLUSTER_TAIL_DATE+":ge:"+moment(endDate).format(format)+"&ou="+oneCaseEvent.orgUnit+"&program="+constant.CLUSTER_PROGRAM + 
+    /*    ajax.getReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances?filter="+constant.CLUSTER_TEA_CLUSTER_TAIL_DATE+":ge:"+moment(endDate).format(format)+"&ou="+oneCaseEvent.orgUnit+"&program="+constant.CLUSTER_PROGRAM + 
                     "&filter="+constant.CLUSTER_TEA_CLUSTER_TYPE+":eq:"+clusterType+
                     "&filter="+constant.CLUSTER_TEA_IS_ACTIVE + ":eq:true"+
                     "&filter="+constant.CLUSTER_TEA_CLUSTER_METHOD+":eq:FIXED",constant.auth,getTEI)
-      
+      */
+        getTEI(null,null,'{"trackedEntityInstances" : []}');
         function getTEI(error,response,body){
             
             if (error){
@@ -93,8 +94,12 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
                     __logger.info("Updated Cluster with UID -"+body.response.reference)
                     var clusterID = utility.findValueAgainstId(cluster_tei.attributes,"attribute",constant.CLUSTER_TEA_CLUSTERID,"value");
 
-                    reportSender.makeClusterInformationReportAndSendEmail(clusterID ,cluster_tei.trackedEntityInstance,cluster_tei.orgUnit,function(){});
-                    callback();
+                //    reportSender.makeClusterInformationReportAndSendEmail(clusterID ,cluster_tei.trackedEntityInstance,cluster_tei.orgUnit,function(){});
+                    
+                    var allCases = utility.findValueAgainstId(cluster_tei.attributes,"attribute",constant.CLUSTER_TEA_CASES_UIDS,"value");
+                    new eventUpdater(allCases,function(){
+                        callback();
+                    })
                     
                 });
 
@@ -208,6 +213,14 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
             for (var i in totalAttr){               
              //   console.log("<> "+i + " - [" +oldAttrMap[i]+"]");                
             }
+
+            var tailDate = utility.findValueAgainstId(cluster_tei.attributes,"attribute",constant.CLUSTER_TEA_CLUSTER_TAIL_DATE,"value");
+
+            cluster_tei.attributes.push({
+                "attribute": constant.CLUSTER_TEA_CLUSTER_START_DATE,
+                "value": tailDate
+            })
+
             ajax.postReq(constant.DHIS_URL_BASE+"/api/trackedEntityInstances",cluster_tei,constant.auth,teiSave);
 
 
@@ -221,7 +234,7 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
                 var clusterID = utility.findValueAgainstId(cluster_tei.attributes,"attribute",constant.CLUSTER_TEA_CLUSTERID,"value");
                 var indexCaseDate = utility.findValueAgainstId(cluster_tei.attributes,"attribute",constant.CLUSTER_TEA_CLUSTER_INDEX_DATE,"value");
 
-                reportSender.makeClusterInformationReportAndSendEmail(clusterID,cluster_tei.trackedEntityInstance,cluster_tei.orgUnit,function(){});
+             //   reportSender.makeClusterInformationReportAndSendEmail(clusterID,cluster_tei.trackedEntityInstance,cluster_tei.orgUnit,function(){});
 
                 __logger.info("Saved Cluster with UID -"+body.response.importSummaries[0].reference)
                 var indexEvent = {
@@ -239,7 +252,11 @@ function saveDataToTracker(cluster_tei,clusterEvents,oneCaseEvent,clusterType,ca
                     
                 });
 
-                callback();
+                var allCases = utility.findValueAgainstId(cluster_tei.attributes,"attribute",constant.CLUSTER_TEA_CASES_UIDS,"value");
+                new eventUpdater(allCases,function(){
+                    callback();
+                })
+                
             }
 
            

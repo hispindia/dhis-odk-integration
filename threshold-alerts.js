@@ -60,6 +60,9 @@ function thresholdAlerts(param){
             // exclude duplicate cases
             fixedAlgoCases = filterEventsByDataValue(fixedAlgoCases,"dataElement",constant.DHIS_DE_DUPLICATE_CASE,"value",["true"],"exclude");            
 
+            // exclude cases which are already part of cluster
+            fixedAlgoCases = filterEventsByDataValue(fixedAlgoCases,"dataElement",constant.DHIS_DE_MEMBEROFCLUSTER,"value",["true"],"exclude");
+            
             var ouWiseCasesMap = utility.prepareMapGroupedById(fixedAlgoCases,"orgUnit");
             findClusters(ouWiseCasesMap,moment(endDate).format(format),callback);
             
@@ -255,7 +258,7 @@ function thresholdAlerts(param){
         now = moment(now).startOf("day");
         
         //console.log("[[[[")
-
+        
         for (var i=0;i<events.length;i++){
             var evDate = new Date(events[i].eventDate);
             var diff = moment(now).diff(moment(evDate).startOf('day'),'days');
