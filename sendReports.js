@@ -64,7 +64,7 @@ __logger.debug("Email Url -> "+emailUrl)
         getEMail(function(emailTO,emailCC){
             var body = "Dear Sir/Madam ,<br/><br/> Please find attached report for date "+date+". <br/><br/><br/> Regards<br/>Application";
             var reportName,subject;
-            var timeout = 1000;
+            var timeout = 3000;
 
 
             reportName = "DR1_ADD_"+date;

@@ -23,7 +23,7 @@ ajax.getReq(constant.DHIS_URL_BASE+"/api/dataElementGroups?fields=id,name,dataEl
 function getDES(error,response,body){
     if (error){
         __logger.error("dataelementgroups fetch")
-        
+        return;
     }
     
     var degroup = JSON.parse(body);

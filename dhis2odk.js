@@ -15,7 +15,7 @@ function dhis2odk(param){
 
    
     var dataElementsCodeMap = [];
-    var _index = -1;
+    var _index = 1;
     var _formList;
     var _mainCallback;
     this.init = function(mainCallback){
@@ -69,6 +69,7 @@ function dhis2odk(param){
             function gotFormDetails(error,response,body){
                 if (error){
                     __logger.error("Fetch Form Details");
+                    return
                 }
                 var formInstance = JSON.parse(x2js.toJson(body))["h:html"]["h:head"]["model"]["instance"];
                 var formBinds = JSON.parse(x2js.toJson(body))["h:html"]["h:head"]["model"]["bind"];
@@ -87,6 +88,7 @@ function dhis2odk(param){
             function gotInstances(error,response,body){
                 if (error){
                     __logger.error("Fetch Instances");
+                    return
                 }
                 
                 var instanceList = JSON.parse(x2js.toJson(body));
@@ -104,7 +106,8 @@ function dhis2odk(param){
         function filterInstanceList(instanceList,callback){
             ajax.getReq(constant.DHIS_URL_BASE+"/api/events?&program="+constant.eventProgram+"&fields=event&skipPaging=true",constant.auth,function(error,response,body){
                 if (error){
-                    __logger.error("Fetch Events (filter)")
+                    __logger.error("Fetch Events (filter)");
+                    return
                 }
                 
                 var events = JSON.parse(body).events;

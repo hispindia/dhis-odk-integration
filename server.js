@@ -102,13 +102,13 @@ var job = new CronJob({
     onTick: function() {
         
         new _dhis2odk().init(function(){
-            
-            eventService.getRecentEventDate(function(error,response,body){
+
+ 	  eventService.getRecentEventDate(function(error,response,body){
                 if (error){
                     __logger.error("Error Fetching latest date Event")
                 }
                 var events = JSON.parse(body).events;
-                
+
                 var endDate = moment();
                 var startDate = new Date();
                 startDate = moment("10-01-2016", "MM-DD-YYYY");
