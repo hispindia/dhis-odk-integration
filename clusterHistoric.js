@@ -15,7 +15,7 @@ function* dateMaker(startDate,endDate){
     }
 }
 
-function clusterHistoric(startDate,endDate){
+function clusterHistoric(startDate,endDate,callback){
 
     var dateYielder = dateMaker(startDate,endDate);         
     
@@ -24,6 +24,7 @@ function clusterHistoric(startDate,endDate){
         var index = dateYielder.next();
         if (index.done){
             __logger.info("Done with making all  CLusters")
+            callback();
             return
         }
         

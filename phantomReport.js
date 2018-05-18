@@ -5,7 +5,7 @@ function phantomReport(param,callback){
 
     getPage();
     function getPage(){
-        phantom.create().then(function(ph) {
+        phantom.create(['--ignore-ssl-errors=yes']).then(function(ph) {
             ph.createPage().then(function(page) {
                 
                 page.property('onNavigationRequested', function(url, type, willNavigate, main) {
@@ -18,13 +18,13 @@ function phantomReport(param,callback){
 
                 page.property('onResourceReceived', function(response) {
                     console.log('= onResourceReceived()' );
-                    // console.log('  id: ' + response.id + ', stage: "' + response.stage + '", response: ' + JSON.stringify(response));
+                     console.log('  id: ' + response.id + ', stage: "' + response.stage + '", response: ' + JSON.stringify(response));
                 });
                 
                 
                 page.property('onResourceRequested', function (request) {
                     console.log('= onResourceRequested()');
-                    //  console.log('  request: ' + JSON.stringify(request, undefined, 4));
+                     console.log('  request: ' + JSON.stringify(request, undefined, 4));
                 });
                 /*
                 page.property("paperSize", {
@@ -70,9 +70,7 @@ function phantomReport(param,callback){
                         return function(){
                           try{
 
-                            console.log('  status: ' + status );
-                            // Render Report as PDF
-                            console.log('  Report: ' + reportPathAndName );
+                          
                               window.setTimeout(function () {
                                 if (emailURL){
                                   var process = require("child_process")
@@ -98,23 +96,30 @@ function phantomReport(param,callback){
                                   
                               }
                               }, 200);
+
+                              console.log('  status: ' + status );
+                              // Render Report as PDF
+                              console.log('  Report: ' + reportPathAndName );
+                              console.log('==== onLoadFinished() --  Rendering Now');
+                              console.log(new Date())
                               thiz.render(reportPathAndName);
-                             
+                              
                           }catch(ex){
                               var fullMessage = "\nJAVASCRIPT EXCEPTION";
-                            fullMessage += "\nMESSAGE: " + ex.toString();
+                              fullMessage += "\nMESSAGE: " + ex.toString();
                               for (var p in ex) {
                                   fullMessage += "\n" + p.toUpperCase() + ": " + ex[p];
                               }
                               console.log(fullMessage);
                               console.log("11111111111111111111111111111111");
-
+                              
                           }
                         }
                     }
                     
                     var fii = foo(this);
-                    setTimeout(fii,10000)
+                    console.log(new Date())
+                    setTimeout(fii,20000)
                     
                 },reportPathAndName,emailURL,callback);
             }catch(ex){

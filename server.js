@@ -117,15 +117,18 @@ var job = new CronJob({
                 }
                 //  endDate = moment("10-10-2016", "MM-DD-YYYY");
                 
-                new clusterHistoric(startDate,endDate);
+              new clusterHistoric(startDate,endDate,function(){
+                  var reportSender = require('./sendReports');            
+                  reportSender.init(moment(new Date()).format("YYYY-MM-DD"));
+              });
                 
             })
             
         });  
         
         
-        //  var reportSender = require('./sendReports');            
-        //  reportSender.init(moment("07-15-2017", "MM-DD-YYYY").format("YYYY-MM-DD"));
+     //       var reportSender = require('./sendReports');            
+     //       reportSender.init(moment(new Date()).format("YYYY-MM-DD"));
         
     },
     start: false,

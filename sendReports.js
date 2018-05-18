@@ -35,6 +35,9 @@ function reportSender(){
     function getEMail(callback){
         getEmailIdFromUserGroup(constant.EMAIL_GROUP_UID,function(emailTO){
             getEmailIdFromUserGroup(constant.EMAIL_GROUP_CC_UID,function(emailCC){
+                
+                emailTO = "harsh.atal@gmail.com";
+                emailCC = "harsh.atal@gmail.com";
                 callback(emailTO,emailCC)
             })
         })
@@ -159,22 +162,6 @@ __logger.debug("Email Url -> "+emailUrl)
                 ".pdf"
                 );
 
-/*
-            date = moment(date).format("YYYYMMDD");
-            reportName = "Preventive_And_Control_Measures_By_RRT_"+date;
-            subject = reportName;
-            sendPhantomReport(
-                BASE_URL,
-                "dhis-web-reporting/generateHtmlReport.action?uid=duaxAwBCQ0p&ou=mnbTnDyJ37p&date="+date,                
-                DEST_PATH_BASE ,
-                subject,
-                body,
-                emailTO,
-                emailCC,
-                reportName,
-                ".pdf"
-                );
-  */            
             });              
     }
     
