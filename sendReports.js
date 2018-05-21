@@ -84,7 +84,7 @@ __logger.debug("Email Url -> "+emailUrl)
                 ".pdf",
                 timeout
                 );
-                
+               
 
             reportName = "DR1_AFI_"+date;
             subject = reportName;
@@ -144,7 +144,7 @@ __logger.debug("Email Url -> "+emailUrl)
                 emailCC,
                 reportName,
                 ".pdf",
-                timeout*20
+                timeout
                 );
 
            

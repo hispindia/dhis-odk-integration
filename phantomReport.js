@@ -7,8 +7,14 @@ function phantomReport(param,callback){
     function getPage(){
         phantom.create(['--ignore-ssl-errors=yes']).then(function(ph) {
             ph.createPage().then(function(page) {
+
+           
+                page.on('onError', function (response) {
+                    console.log('= onError()' );
+                    console.log('  id: ' + response.id + ', stage: "' + response.stage + '", response: ' + (response));
+                });
                 
-                page.property('onNavigationRequested', function(url, type, willNavigate, main) {
+                page.on('onNavigationRequested', function(url, type, willNavigate, main) {
                     console.log('= onNavigationRequested');
                     console.log('  destination_url: ' + url);
                     console.log('  type (cause): ' + type);
@@ -16,15 +22,27 @@ function phantomReport(param,callback){
                     console.log('  from page\'s main frame: ' + main);
                 });    
 
-                page.property('onResourceReceived', function(response) {
+                page.on('onResourceReceived', function(response) {
                     console.log('= onResourceReceived()' );
-                     console.log('  id: ' + response.id + ', stage: "' + response.stage + '", response: ' + JSON.stringify(response));
+                    
+                    //console.log('  id: ' + response.id + ', stage: "' + response.stage + '", response: ' + JSON.stringify(response));
+
+                    console.log('  id: ' + response.id + ', stage: "' + response.stage + '", response: ' + JSON.stringify(response.url));
                 });
                 
                 
-                page.property('onResourceRequested', function (request) {
-                    console.log('= onResourceRequested()');
-                     console.log('  request: ' + JSON.stringify(request, undefined, 4));
+                page.on('onResourceRequested', function (request) {
+                    console.log('= onResourceRequested()')
+      //               console.log('  request: ' + JSON.stringify(request, undefined, 4));
+                });
+                page.on('onResourceError', function (request) {
+                    console.log('= onResourceError()');
+                    console.log('  onResourceError: ' + JSON.stringify(request, undefined, 4));
+                });
+                
+                page.on('onConsoleMessage', function(msg, lineNum, sourceId) {
+                    console.log("asdads")
+                    console.log('CONSOLE: ' + msg + ' (from line #' + lineNum + ' in "' + sourceId + '")');
                 });
                 /*
                 page.property("paperSize", {
@@ -47,7 +65,7 @@ function phantomReport(param,callback){
         });
     }
     function gotPage(page){
-        
+
         page.open(param.BASE_URL + param.REPORT_URL).then(function(status) {
             console.log(status);
             try{
@@ -57,7 +75,7 @@ function phantomReport(param,callback){
                         document.getElementById("j_username").value = "admin";
                         document.getElementById("j_password").value = "Hisp@1234";
                         document.getElementById("submit").click();
-                    },100)
+                    },1)
                     
                 })
                 var reportPathAndName = param.OUTPUT_PATH;
@@ -101,7 +119,6 @@ function phantomReport(param,callback){
                               // Render Report as PDF
                               console.log('  Report: ' + reportPathAndName );
                               console.log('==== onLoadFinished() --  Rendering Now');
-                              console.log(new Date())
                               thiz.render(reportPathAndName);
                               
                           }catch(ex){
@@ -118,8 +135,9 @@ function phantomReport(param,callback){
                     }
                     
                     var fii = foo(this);
-                    console.log(new Date())
-                    setTimeout(fii,20000)
+                                    
+                    setTimeout(foo(this),1*15*1000)
+                 
                     
                 },reportPathAndName,emailURL,callback);
             }catch(ex){
