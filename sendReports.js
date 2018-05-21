@@ -84,8 +84,7 @@ __logger.debug("Email Url -> "+emailUrl)
                 timeout
                 );
 
-            });             
-
+            
             reportName = "DR1_ADD_"+date;
             subject = reportName;
             sendPhantomReport(
@@ -98,7 +97,7 @@ __logger.debug("Email Url -> "+emailUrl)
                 emailCC,
                 reportName,
                 ".pdf",
-                timeout
+                timeout*3
                 );
                
 
@@ -160,10 +159,10 @@ __logger.debug("Email Url -> "+emailUrl)
                 emailCC,
                 reportName,
                 ".pdf",
-                timeout
+                timeout*5
                 );
 
-           
+           }); 
           
     }
     
