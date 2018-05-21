@@ -5,13 +5,16 @@ function phantomReport(param,callback){
 
     getPage();
     function getPage(){
-        phantom.create(['--ignore-ssl-errors=yes']).then(function(ph) {
+        phantom.create([   
+'--ignore-ssl-errors=yes', 
+      '--ssl-protocol=any',
+      '--web-security=false']).then(function(ph) {
             ph.createPage().then(function(page) {
 
            
-                page.on('onError', function (response) {
+                page.on('onError', function (response,two,three) {
                     console.log('= onError()' );
-                    console.log('  id: ' + response.id + ', stage: "' + response.stage + '", response: ' + (response));
+                    console.log('  id: ' + JSON.stringify(two) + ', stage: "' + three + '", response: ' + (response));
                 });
                 
                 page.on('onNavigationRequested', function(url, type, willNavigate, main) {
@@ -41,7 +44,7 @@ function phantomReport(param,callback){
                 });
                 
                 page.on('onConsoleMessage', function(msg, lineNum, sourceId) {
-                    console.log("asdads")
+                    
                     console.log('CONSOLE: ' + msg + ' (from line #' + lineNum + ' in "' + sourceId + '")');
                 });
                 /*
@@ -136,7 +139,7 @@ function phantomReport(param,callback){
                     
                     var fii = foo(this);
                                     
-                    setTimeout(foo(this),1*15*1000)
+                    setTimeout(foo(this),1*30*1000)
                  
                     
                 },reportPathAndName,emailURL,callback);
