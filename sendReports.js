@@ -69,6 +69,22 @@ __logger.debug("Email Url -> "+emailUrl)
             var reportName,subject;
             var timeout = 3000;
 
+            reportName = "Daily_Summary_"+date;
+            subject = reportName;
+            sendPhantomReport(
+                BASE_URL,
+                "dhis-web-reporting/generateHtmlReport.action?uid=IzcRhuml41p&ou=mnbTnDyJ37p&date="+date,                
+                DEST_PATH_BASE ,
+                subject,
+                body,
+                emailTO,
+                emailCC,
+                reportName,
+                ".pdf",
+                timeout
+                );
+
+            });             
 
             reportName = "DR1_ADD_"+date;
             subject = reportName;
@@ -148,21 +164,7 @@ __logger.debug("Email Url -> "+emailUrl)
                 );
 
            
-            reportName = "Daily_Summary_"+date;
-            subject = reportName;
-            sendPhantomReport(
-                BASE_URL,
-                "dhis-web-reporting/generateHtmlReport.action?uid=IzcRhuml41p&ou=mnbTnDyJ37p&date="+date,                
-                DEST_PATH_BASE ,
-                subject,
-                body,
-                emailTO,
-                emailCC,
-                reportName,
-                ".pdf"
-                );
-
-            });              
+          
     }
     
     this.makeClusterInformationReportAndSendEmail = function(name,tei,ou,callback){
