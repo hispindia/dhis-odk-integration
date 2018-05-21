@@ -36,8 +36,8 @@ function reportSender(){
         getEmailIdFromUserGroup(constant.EMAIL_GROUP_UID,function(emailTO){
             getEmailIdFromUserGroup(constant.EMAIL_GROUP_CC_UID,function(emailCC){
                 
-                emailTO = "harsh.atal@gmail.com";
-                emailCC = "harsh.atal@gmail.com";
+//                emailTO = "harsh.atal@gmail.com";
+  //              emailCC = "harsh.atal@gmail.com";
                 callback(emailTO,emailCC)
             })
         })

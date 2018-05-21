@@ -100,7 +100,7 @@ __logger.info("Starting service");
 var job = new CronJob({
     cronTime: '00 59 13 * * *',
     onTick: function() {
- /*       
+        
         new _dhis2odk().init(function(){
 
  	  eventService.getRecentEventDate(function(error,response,body){
@@ -125,10 +125,10 @@ var job = new CronJob({
             })
             
         });  
-   */     
         
-        var reportSender = require('./sendReports');            
-        reportSender.init(moment(new Date()).format("YYYY-MM-DD"));
+        
+  //      var reportSender = require('./sendReports');            
+//        reportSender.init(moment(new Date()).format("YYYY-MM-DD"));
 
         
     },
