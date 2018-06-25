@@ -3,6 +3,7 @@ var ajax = require("./ajax");
 const moment  = require('moment');
 const phantomReport  = require('./phantomReport');
 var constant=require("./CONSTANTS");
+var utility = require('./utility-functions');
 
 const BASE_URL = constant.DHIS_URL_BASE;
 const DEST_PATH_BASE = constant.DEST_PATH_BASE;
@@ -36,8 +37,8 @@ function reportSender(){
         getEmailIdFromUserGroup(constant.EMAIL_GROUP_UID,function(emailTO){
             getEmailIdFromUserGroup(constant.EMAIL_GROUP_CC_UID,function(emailCC){
                 
-//                emailTO = "harsh.atal@gmail.com";
-  //              emailCC = "harsh.atal@gmail.com";
+                emailTO = "harsh.atal@gmail.com";
+                emailCC = "harsh.atal@gmail.com";
                 callback(emailTO,emailCC)
             })
         })
@@ -163,8 +164,10 @@ __logger.debug("Email Url -> "+emailUrl)
                 );
 
            }); 
-          
+
+        cluster_information_report();
     }
+
     
     this.makeClusterInformationReportAndSendEmail = function(name,tei,ou,callback){
      
@@ -184,6 +187,7 @@ __logger.debug("Email Url -> "+emailUrl)
                 }
                 emailStr = emailStr.substr(0,emailStr.length-1);
                 emailStr = emailCC;
+                emailStr=emailCC = "harsh.atal@gmail.com"
                 var body = "Dear Sir/Madam ,<br/><br/> Please find attached report. <br/><br/><br/> Auto Generated Email<br/>";
             var reportName,subject;
                 var timeout = Math.floor(Math.random()*5*60*1000);
@@ -223,6 +227,29 @@ __logger.debug("Email Url -> "+emailUrl)
             }
             return users;
         }
+    }
+
+    
+    function cluster_information_report(){
+        var date = moment("2018-01-01").format("YYYY-MM-DD");
+        var url = "api/trackedEntityInstances?ou=mnbTnDyJ37p&ouMode=DESCENDANTS&filter=XGWh7OT2Pa8:eq:"+date+"&program=mcnt7nqNrNw&skipPaging=true"
+        ajax.getReq(BASE_URL+url,constant.auth, function (error, response, body) {
+	    if (error){
+                console.log("Error tei")
+                    return
+            }
+
+            var teis = JSON.parse(body);
+            var rs = new reportSender();
+            teis.trackedEntityInstances.map(function(cluster_tei,index){
+                
+                var clusterID = utility.findValueAgainstId(cluster_tei.attributes,"attribute",constant.CLUSTER_TEA_CLUSTERID,"value");
+                setTimeout(function(){
+                    rs.makeClusterInformationReportAndSendEmail(clusterID,cluster_tei.trackedEntityInstance,cluster_tei.orgUnit,function(){});
+                },1000*(index+1));
+            })
+            
+        });   
     }
 }
 

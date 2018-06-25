@@ -2,6 +2,8 @@ var _dhis2odk = require('./dhis2odk');
 var constant=require("./CONSTANTS");
 var CronJob = require('cron').CronJob;
 var clusterHistoric = require('./clusterHistoric');
+var clusterQ = require('./clusterQ');
+
 var moment = require("moment");
 var express = require('express');
 
@@ -100,35 +102,19 @@ __logger.info("Starting service");
 var job = new CronJob({
     cronTime: '00 59 13 * * *',
     onTick: function() {
-        
-        new _dhis2odk().init(function(){
 
- 	  eventService.getRecentEventDate(function(error,response,body){
-                if (error){
-                    __logger.error("Error Fetching latest date Event")
-                }
-                var events = JSON.parse(body).events;
-
-                var endDate = moment();
-                var startDate = new Date();
-                startDate = moment("10-01-2016", "MM-DD-YYYY");
-                if (events.length >0){
-                    startDate = events[0].eventDate;
-                }
-                //  endDate = moment("10-10-2016", "MM-DD-YYYY");
-                
-              new clusterHistoric(startDate,endDate,function(){
-                  var reportSender = require('./sendReports');            
-                  reportSender.init(moment(new Date()).format("YYYY-MM-DD"));
-              });
-                
-            })
+       new _dhis2odk().init(function(){              
+            __logger.info("Generating All Clusters...");
+            new clusterQ(function(response){
+                var reportSender = require('./sendReports');            
+                reportSender.init(moment(new Date()).format("YYYY-MM-DD"));
+            });
             
         });  
         
         
-  //      var reportSender = require('./sendReports');            
-//        reportSender.init(moment(new Date()).format("YYYY-MM-DD"));
+     //         var reportSender = require('./sendReports');            
+       //         reportSender.init(moment(new Date()).format("YYYY-MM-DD"));
 
         
     },
