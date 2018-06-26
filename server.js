@@ -113,8 +113,8 @@ var job = new CronJob({
         });  
         
         
-     //         var reportSender = require('./sendReports');            
-       //         reportSender.init(moment(new Date()).format("YYYY-MM-DD"));
+//              var reportSender = require('./sendReports');            
+  //              reportSender.init(moment(new Date()).format("YYYY-MM-DD"));
 
         
     },

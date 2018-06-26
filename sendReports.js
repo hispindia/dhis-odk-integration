@@ -37,8 +37,8 @@ function reportSender(){
         getEmailIdFromUserGroup(constant.EMAIL_GROUP_UID,function(emailTO){
             getEmailIdFromUserGroup(constant.EMAIL_GROUP_CC_UID,function(emailCC){
                 
-                emailTO = "harsh.atal@gmail.com";
-                emailCC = "harsh.atal@gmail.com";
+//                emailTO = "harsh.atal@gmail.com";
+  //              emailCC = "arvind.chikne@gmail.com";
                 callback(emailTO,emailCC)
             })
         })
@@ -136,7 +136,7 @@ __logger.debug("Email Url -> "+emailUrl)
             subject = reportName;
             sendPhantomReport(
                 BASE_URL,
-                "dhis-web-reporting/generateHtmlReport.action?uid=Ez8dVZHdPEm&ou=mnbTnDyJ37p&startdate="+date+"&enddate="+date,                
+                "dhis-web-reporting/generateHtmlReport.action?uid=xyHXeiJL9lG&ou=mnbTnDyJ37p&startdate="+date+"&enddate="+date,                
                 DEST_PATH_BASE ,
                 subject,
                 body,
@@ -152,7 +152,7 @@ __logger.debug("Email Url -> "+emailUrl)
             subject = reportName;
             sendPhantomReport(
                 BASE_URL,
-                "dhis-web-reporting/generateHtmlReport.action?uid=CVLrlTvIK9I&ou=mnbTnDyJ37p&startdate="+date+"&enddate="+date,                
+                "dhis-web-reporting/generateHtmlReport.action?uid=ahxuMgKzaoA&ou=mnbTnDyJ37p&startdate="+date+"&enddate="+date,                
                 DEST_PATH_BASE ,
                 subject,
                 body,
@@ -187,7 +187,7 @@ __logger.debug("Email Url -> "+emailUrl)
                 }
                 emailStr = emailStr.substr(0,emailStr.length-1);
                 emailStr = emailCC;
-                emailStr=emailCC = "harsh.atal@gmail.com"
+    //            emailStr=emailCC = "harsh.atal@gmail.com"
                 var body = "Dear Sir/Madam ,<br/><br/> Please find attached report. <br/><br/><br/> Auto Generated Email<br/>";
             var reportName,subject;
                 var timeout = Math.floor(Math.random()*5*60*1000);
