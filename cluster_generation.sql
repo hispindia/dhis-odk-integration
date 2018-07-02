@@ -76,7 +76,7 @@ from
 	inner join programstageinstance psi on psi.programstageinstanceid = tedv.programstageinstanceid
 	inner join dataelement de on de.dataelementid = tedv.dataelementid
 	where concat(de.name,$$:$$,tedv.value) in (values ($$id:eDFSS_IPD_V3$$),($$Diagnosis_Information/Syndrome:AFI$$))
-	and psi.executiondate between $1::date - interval $$8 days$$ and $1::date - interval $$1 days$$
+	and psi.executiondate between $1::date - interval $$6 days$$ and $1::date - interval $$1 days$$
 	and psi.uid not in (select distinct unnest(cases_gg) from clusters)
         and psi.programstageinstanceid not in (
                                                select psi.programstageinstanceid
@@ -218,7 +218,7 @@ BEGIN
                                       organisationunitid, trackedentityid)
     VALUES (nextval('hibernate_sequence'),uid , null, now(), now(), 50, 
             now(), now(), false, false, null, 
-            c.ou::integer, 30833)
+             c.ou::integer, 30833)
     returning trackedentityinstanceid into tei;
 
     SELECT concat('E',right(uuid_generate_v4()::text,10)) into uid;	

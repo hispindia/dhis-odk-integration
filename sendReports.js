@@ -231,7 +231,7 @@ __logger.debug("Email Url -> "+emailUrl)
 
     
     function cluster_information_report(){
-        var date = moment("2018-01-01").format("YYYY-MM-DD");
+        var date = moment().format("YYYY-MM-DD");
         var url = "api/trackedEntityInstances?ou=mnbTnDyJ37p&ouMode=DESCENDANTS&filter=XGWh7OT2Pa8:eq:"+date+"&program=mcnt7nqNrNw&skipPaging=true"
         ajax.getReq(BASE_URL+url,constant.auth, function (error, response, body) {
 	    if (error){
