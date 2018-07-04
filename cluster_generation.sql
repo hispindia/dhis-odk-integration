@@ -94,7 +94,6 @@ having count(evuid) = 3 or count(evuid) = 4
 )clusters, unnest(cases_gg) gg
 group by d,ou
 
-
 union
 
 select d,ou,array_length(array_agg(distinct gg),1) as cases,max(ctype) as ctype_max,min(ctype) as ctype_min,array_agg(distinct gg) as cases_gg,max(coord) as coord
@@ -228,7 +227,7 @@ BEGIN
                                 completedby, longitude, latitude, deleted, status, trackedentityinstanceid, 
                                 programid, organisationunitid)
     VALUES (nextval('hibernate_sequence'), uid, now(), now(), now(), 
-            now(), now(), now(), null, false, 
+            now(), c.d, c.d, null, false, 
             null, null, null, false, 'ACTIVE', tei, 
             30835, c.ou::integer)
     returning programinstanceid into enrollment;
