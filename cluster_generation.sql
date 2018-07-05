@@ -278,7 +278,7 @@ BEGIN
                                                             status, longitude, latitude, completedby, completeddate)
                     VALUES (nextval('hibernate_sequence'), uid, null, now(), now(), now(), 
                             now(), enrollment, 30837, 19, 
-                            false, 'admin', now(), now(), c.ou::integer, 
+                            false, 'admin', c.d, c.d , c.ou::integer, 
                             'COMPLETED', null, null, 'admin', now());
                     
                     --	RAISE NOTICE 'Saved cluster  %...%', c,tei;
