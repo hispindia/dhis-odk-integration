@@ -139,7 +139,7 @@ function phantomReport(param,callback){
                     
                     var fii = foo(this);
                                     
-                    setTimeout(foo(this),1*30*1000)
+                    setTimeout(foo(this),1*30*2000)
                  
                     
                 },reportPathAndName,emailURL,callback);
